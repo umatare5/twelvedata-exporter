@@ -1,0 +1,3 @@
+[build]
+cmd = "go build -o twelvedata-exporter ./cmd/main.go"
+bin = "twelvedata-exporter --limit 8"

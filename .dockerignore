@@ -1,0 +1,6 @@
+.*
+Dockerfile*
+Makefile*
+.git*
+*.md
+twelvedata-exporter

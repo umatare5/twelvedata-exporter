@@ -1,0 +1,10 @@
+# Main binary
+twelvedata-exporter
+
+# Other files
+.DS_Store
+bin
+dist
+tmp
+vendor
+.envrc
