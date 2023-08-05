@@ -2,92 +2,163 @@
 
 ![](https://github.com/umatare5/twelvedata-exporter/workflows/Go/badge.svg)
 
-This is a simple stock and funds quotes exporter for
-[prometheus](http://prometheus.io). This exporter allows a prometheus instance
-to monitor prices of stocks, ETFs, and mutual funds, possibly alerting the user
-on any desirable condition (note: prometheus configuration not covered here.)
+twelvedata-exporter is a Prometheus Exporter to fetch quotes from Twelvedata API.
 
-## Data Provider Setup
+This exporter allows a prometheus instance to monitor prices of stocks, ETFs, and mutual funds.
 
-This project uses the [stonks page](https://stonks.scd31.com) to fetch stock
-price information. This method **does not** support Mutual Funds, but avoids
-the hassle of having to create an API key and quota issues of most financial
-API providers.
+> [!Important]
+>
+> To access the Twelvedata API, you need an access token. Please register with [Twelvedata](https://twelvedata.com/) in advance and generate an access token by referring to [the official document: Getting Started - Authentication](https://twelvedata.com/docs#authentication).
 
-The program is smart enough to "memoize" calls to the financial data provider
-and by default caches quotes for 10m. This should reduce the load on the
-finance servers, as prometheus tends to scrape exporters on short time
-intervals.
-
-## Building the exporter
-
-To build the exporter, you need a relatively recent version of the [Go
-compiler](http://golang.org). Download and install the Go compiler and type the
-following commands to download, compile, and install the twelvedata-exporter binary
-to `/usr/local/bin`:
+## Installation
 
 ```bash
-OLDGOPATH="$GOPATH"
-export GOPATH="/tmp/tempgo"
-go get -u -t -v github.com/umatare5/twelvedata-exporter
-sudo mv $GOPATH/bin/twelvedata-exporter /usr/local/bin
-export GOPATH=$OLDGOPATH
-rm -rf /tmp/tempgo
+docker run ghcr.io/umatare5/twelvedata-exporter
 ```
 
-## Docker image
+> [!Tip]
+> If you would like to use binaries, please download them from [release page](https://github.com/umatare5/twelvedata-exporter/releases).
+>
+> - `linux_amd64`, `linux_arm64`, `darwin_amd64`, `darwin_arm64` and `windows_amd64` are supported.
 
-The repository includes a ready to use `Dockerfile`. To build a new image, type:
+## Syntax
+
+```bash
+NAME:
+   Fetch quotes from Twelvedata API - twelvedata-exporter
+
+USAGE:
+   twelvedata-exporter COMMAND [options...]
+
+VERSION:
+   0.1.0
+
+COMMANDS:
+   help, h  Shows a list of commands or help for one command
+
+GLOBAL OPTIONS:
+   --web.listen-address value, -I value     Set IP address (default: "0.0.0.0")
+   --web.listen-port value, -P value        Set port number (default: 9341)
+   --web.scrape-path value, -p value        Set the path to expose metrics (default: "/price")
+   --twelvedata.api-key value, -a value     Set key to use twelvedata API [$TWELVEDATA_API_KEY]
+   --help, -h                               show help
+   --version, -v                            print the version
+```
+
+## Configuration
+
+This exporter supports following environment variables:
+
+| Environment Variable | Description                          |
+| :------------------- | ------------------------------------ |
+| `TWELVEDATA_API_KEY` | The API Key to be used for requests. |
+
+## Metrics
+
+This exporter returns following metrics:
+
+| Metric Name                       | Description                              | Type  | Example Value   |
+| --------------------------------- | ---------------------------------------- | ----- | --------------- |
+| `twelvedata_change_percent`       | Changed percent since last close price.  | Gauge | `1.00975`       |
+| `twelvedata_change_price`         | Changed price since last close price.    | Gauge | `1.72`          |
+| `twelvedata_price`                | Real-time or the latest available price. | Gauge | `172.06`        |
+| `twelvedata_previous_close_price` | Closing price of the previous day.       | Gauge | `170.34`        |
+| `twelvedata_volume`               | Trading volume during the bar.           | Gauge | `1.5206856e+07` |
+
+<details><summary><u>Click to show full metrics</u></summary><p>
+
+```plain
+# HELP twelvedata_change_percent Changed percent since last close price.
+# TYPE twelvedata_change_percent gauge
+twelvedata_change_percent{currency="USD",exchange="NASDAQ",name="Alphabet Inc",symbol="GOOGL"} 1.00975
+# HELP twelvedata_change_price Changed price since last close price.
+# TYPE twelvedata_change_price gauge
+twelvedata_change_price{currency="USD",exchange="NASDAQ",name="Alphabet Inc",symbol="GOOGL"} 1.72
+# HELP twelvedata_failed_queries_total Count of failed queries
+# TYPE twelvedata_failed_queries_total counter
+twelvedata_failed_queries_total 0
+# HELP twelvedata_previous_close_price Closing price of the previous day.
+# TYPE twelvedata_previous_close_price gauge
+twelvedata_previous_close_price{currency="USD",exchange="NASDAQ",name="Alphabet Inc",symbol="GOOGL"} 170.34
+# HELP twelvedata_price Real-time or the latest available price.
+# TYPE twelvedata_price gauge
+twelvedata_price{currency="USD",exchange="NASDAQ",name="Alphabet Inc",symbol="GOOGL"} 172.06
+# HELP twelvedata_queries_total Count of completed queries
+# TYPE twelvedata_queries_total counter
+twelvedata_queries_total 1
+# HELP twelvedata_query_duration_seconds Duration of queries to the upstream API
+# TYPE twelvedata_query_duration_seconds summary
+twelvedata_query_duration_seconds_sum 0
+twelvedata_query_duration_seconds_count 0
+# HELP twelvedata_volume Trading volume during the bar.
+# TYPE twelvedata_volume gauge
+twelvedata_volume{currency="USD",exchange="NASDAQ",name="Alphabet Inc",symbol="GOOGL"} 1.5206856e+07
+```
+
+</p></details>
+
+## Usage
+
+### Exporter
+
+To refer to the usage, please access http://localhost:9341/ after starting the exporter.
+
+```bash
+❯ ./twelvedata-exporter --twelvedata.api-key "foobarbaz0123456789abcdefghijklm"
+INFO[0000] Listening on port 0.0.0.0:9341
+```
+
+### Prometheus
+
+Please refer to [prometheus.sample.yml#L27-L42](./prometheus.sample.yml#L27-L42).
+
+- To know how to write technical indicators as PromQL, please refer to [prometheus.rules.sample.yml](./prometheus.rules.sample.yml).
+
+> [!Tip]
+>
+> The Twelvedata API has rate limits based on the license. Please adjust the `scrape_interval` and `scrape_timeout` to comply with these limits. For further the limits, please refer to [twelvedata - Pricing](https://twelvedata.com/pricing).
+
+## Development
+
+### Build
+
+The repository includes a ready to use `Dockerfile`. Run the following command to build a new image:
 
 ```bash
 make image
 ```
 
-Run `docker images` to see the list of images. The new image is named as
-$USER/twelvedata-exporter and exports port 9341 to your host.
+The new image is named as `$USER/twelvedata-exporter` and exports `9341/tcp` to your host.
 
-## Running the exporter
+### Release
 
-To run the exporter, just type:
+I'm releasing this exporter manually.
 
-```base
-twelvedata-exporter
+```shell
+git tag vX.Y.Z && git push --tags
 ```
 
-The exporter listens on port 9341 by default. You can use the `--port` command-line
-flag to change the port number, if necessary.
+Run the release workflow.
 
-## Testing
+- [GitHub Actions: release workflow](https://github.com/umatare5/twelvedata-exporter/actions/workflows/release.yaml)
 
-Use your browser to access [localhost:9341](http://localhost:9341). The exporter should display a simple
-help page. If that's OK, you can attempt to fetch a stock using something like:
+## Contribution
 
-[http://localhost:9341/price?symbols=GOOGL](http://localhost:9341/price?symbols=GOOGL)
+1. Fork ([https://github.com/umatare5/twelvedata-exporter/fork](https://github.com/umatare5/twelvedata-exporter/fork))
+2. Create a feature branch
+3. Commit your changes
+4. Rebase your local changes against the master branch
+5. Create a new Pull Request
 
-The result should be similar to:
+## Licence
 
-```
-# HELP twelvedata_stock_price Asset Price.
-# TYPE twelvedata_stock_price gauge
-twelvedata_stock_price{name="Alphabet Inc.",symbol="GOOGL"} 1333.54
-# HELP twelvedata_exporter_failed_queries_total Count of failed queries
-# TYPE twelvedata_exporter_failed_queries_total counter
-twelvedata_exporter_failed_queries_total 1
-# HELP twelvedata_exporter_queries_total Count of completed queries
-# TYPE twelvedata_exporter_queries_total counter
-twelvedata_exporter_queries_total 5
-# HELP twelvedata_exporter_query_duration_seconds Duration of queries to the upstream API
-# TYPE twelvedata_exporter_query_duration_seconds summary
-twelvedata_exporter_query_duration_seconds_sum 0.000144555
-twelvedata_exporter_query_duration_seconds_count 4
-```
+[MIT](LICENSE)
+
+## Author
+
+[umatare5](https://github.com/umatare5)
 
 ## Acknowledgements
 
-I started looking around for a prometheus compatible quotes exporter but
-couldn't find anything that satisfied my needs. The closest I found was
-[Tristan Colgate-McFarlane](https://github.com/tcolgate)'s [yquotes
-exporter](https://github.com/tcolgate/ytwelvedata_exporter), which has stopped
-working as Yahoo appears to have deprecated the endpoints required to download
-stock data. My thanks to Tristan for his code, which served as the initial
-template for this project.
+I used to use [Marco Paganini](https://github.com/marcopaganini)'s [quotes-exporter](https://github.com/marcopaganini/quotes-exporter) before. However, due to changes in the external endpoint, that exporter was broken and archived.
+Now, I built this exporter taking Marco's exporter as a reference. My thanks to Marco the predecessor, and [Tristan Colgate-McFarlane](https://github.com/tcolgate) the creator of [yquotes-exporter](https://github.com/tcolgate/yquotes_exporter) who preceded Marco.

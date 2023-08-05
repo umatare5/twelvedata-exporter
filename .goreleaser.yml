@@ -10,10 +10,6 @@ github_urls:
   # set to true if you use a self-signed certificate
   skip_tls_verify: false
 
-before:
-  hooks:
-    - go mod tidy
-
 builds:
   - main: main.go
     id: twelvedata-exporter
@@ -33,11 +29,15 @@ builds:
     gcflags:
       - all=-trimpath=.
 
+dockers:
+- id: twelvedata-exporter
+  image_templates:
+  - 'ghcr.io/umatare5/twelvedata-exporter:latest'
+  - 'ghcr.io/umatare5/twelvedata-exporter:{{ .Tag }}'
+  dockerfile: Dockerfile.goreleaser
+
 archives:
   - name_template: '{{ .ProjectName }}-v{{ .Version }}_{{ .Os }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}'
-    format_overrides:
-      - goos: windows
-        format: zip
 
 release:
   prerelease: auto

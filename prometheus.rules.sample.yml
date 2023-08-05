@@ -1,0 +1,25 @@
+groups:
+  - name: technical_indicators
+    rules:
+    - record: twelvedata:technical:rsi:7
+      expr: 100 - (100 / (1 +
+              (
+                (
+                  (
+                    sum_over_time((delta(twelvedata_price[1h]) > 0)[9d:])
+                    *
+                    (count_over_time((twelvedata_change_percent > 0)[9d:]) - 1)
+                  )
+                  / count_over_time((twelvedata_change_percent > 0)[9d:])
+                )
+              /
+                abs(
+                  (
+                    sum_over_time((delta(twelvedata_price[1h]) < 0)[9d:])
+                    *
+                    (count_over_time((twelvedata_change_percent < 0)[9d:]) - 1)
+                  )
+                  / count_over_time((twelvedata_change_percent < 0)[9d:])
+                )
+              )
+            ))

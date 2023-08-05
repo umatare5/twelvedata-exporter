@@ -1,0 +1,8 @@
+FROM alpine
+
+WORKDIR /app
+COPY twelvedata-exporter /bin/
+
+EXPOSE 9341
+USER ${UID}
+ENTRYPOINT [ "/bin/twelvedata-exporter" ]
