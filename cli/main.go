@@ -5,35 +5,25 @@ import (
 	"fmt"
 	"os"
 
-	server "github.com/umatare5/twelvedata-exporter/internal"
+	"github.com/umatare5/twelvedata-exporter/config"
+	"github.com/umatare5/twelvedata-exporter/internal"
 	"github.com/urfave/cli/v2"
 )
 
-const (
-	webListenAddressFlagName    = "web.listen-address"
-	webListenPortFlagName       = "web.listen-port"
-	twelvedataAPIKeyFlagName    = "twelvedata.api-key"
-	twelvedataRateLimitFlagName = "twelvedata.rate-limit"
-)
-
-// Start is a entrypoint of this command
+// Start is the entrypoint of this CLI
 func Start() {
 	cmd := &cli.App{
 		Name:      "twelvedata-exporter",
-		HelpName:  "Fetch metrics from Twelvedata API",
+		HelpName:  "Fetch quotes from Twelvedata API",
 		Usage:     "twelvedata-exporter",
 		UsageText: "twelvedata-exporter COMMAND [options...]",
-		Version:   "0.1.0",
+		Version:   "1.0.0",
 		Flags:     registerFlags(),
 		Action: func(ctx *cli.Context) error {
-			config := newConfig(ctx)
-			server := server.New(
-				config.WebListenAddress,
-				config.WebListenPort,
-				config.TwelvedataAPIKey,
-				config.TwelvedataRateLimit,
-			)
-			server.Boot()
+			config := config.NewConfig(ctx)
+			server, _ := internal.NewServer(&config)
+
+			server.Start()
 
 			return nil
 		},
@@ -51,8 +41,8 @@ func registerFlags() []cli.Flag {
 	flags := []cli.Flag{}
 	flags = append(flags, registerWebListenAddressFlag()...)
 	flags = append(flags, registerWebListenPortFlag()...)
+	flags = append(flags, registerWebScrapePathFlag()...)
 	flags = append(flags, registerAPIKeyFlag()...)
-	flags = append(flags, registerRateLimitFlag()...)
 	return flags
 }
 
@@ -60,7 +50,7 @@ func registerFlags() []cli.Flag {
 func registerWebListenAddressFlag() []cli.Flag {
 	return []cli.Flag{
 		&cli.StringFlag{
-			Name:    webListenAddressFlagName,
+			Name:    config.WebListenAddressFlagName,
 			Usage:   "Set IP address",
 			Aliases: []string{"I"},
 			Value:   "0.0.0.0",
@@ -72,10 +62,22 @@ func registerWebListenAddressFlag() []cli.Flag {
 func registerWebListenPortFlag() []cli.Flag {
 	return []cli.Flag{
 		&cli.IntFlag{
-			Name:    webListenPortFlagName,
+			Name:    config.WebListenPortFlagName,
 			Usage:   "Set port number",
 			Aliases: []string{"P"},
 			Value:   9341,
+		},
+	}
+}
+
+// registerWebScrapePathFlag
+func registerWebScrapePathFlag() []cli.Flag {
+	return []cli.Flag{
+		&cli.StringFlag{
+			Name:    config.WebScrapePathFlagName,
+			Usage:   "Set the path to expose metrics",
+			Aliases: []string{"p"},
+			Value:   "/price",
 		},
 	}
 }
@@ -84,23 +86,11 @@ func registerWebListenPortFlag() []cli.Flag {
 func registerAPIKeyFlag() []cli.Flag {
 	return []cli.Flag{
 		&cli.StringFlag{
-			Name:     twelvedataAPIKeyFlagName,
+			Name:     config.TwelvedataAPIKeyFlagName,
 			Usage:    "Set key to use twelvedata API",
 			Aliases:  []string{"a"},
 			EnvVars:  []string{"TWELVEDATA_API_KEY"},
 			Required: true,
-		},
-	}
-}
-
-// registerRateLimitFlag
-func registerRateLimitFlag() []cli.Flag {
-	return []cli.Flag{
-		&cli.IntFlag{
-			Name:    twelvedataRateLimitFlagName,
-			Usage:   "Set rate limit per minute to use twelvedata API",
-			Aliases: []string{"l"},
-			Value:   0,
 		},
 	}
 }

@@ -1,181 +1,128 @@
-// Package internal is a server that uses the twelvedata API as its backend.
+// Package internal contains the implementation of this exporter.
 package internal
 
 import (
-	"fmt"
-	"log"
-	"net/url"
 	"strconv"
-	"strings"
-	"time"
 
-	"github.com/kofalt/go-memoize"
 	"github.com/prometheus/client_golang/prometheus"
+	"github.com/umatare5/twelvedata-exporter/log"
 )
 
+const (
+	namespace = "twelvedata"
+)
+
+// Metrics descriptions
 var (
-	// These are metrics for the collector itself
-	queryDuration = prometheus.NewSummary(
-		prometheus.SummaryOpts{
-			Name: "twelvedata_query_duration_seconds",
-			Help: "Duration of queries to the upstream API",
-		},
-	)
-	queryCount = prometheus.NewCounter(
-		prometheus.CounterOpts{
-			Name: "twelvedata_queries_total",
-			Help: "Count of completed queries",
-		},
-	)
-	errorCount = prometheus.NewCounter(
-		prometheus.CounterOpts{
-			Name: "twelvedata_failed_queries_total",
-			Help: "Count of failed queries",
-		},
+	change_price = prometheus.NewDesc( //nolint:golint,revive
+		prometheus.BuildFQName(namespace, "", "change_price"),
+		"Changed price since last close price.",
+		[]string{"symbol", "name", "exchange", "currency"}, nil,
 	)
 
-	// Cache external API consuming calls for 10 minutes.
-	cache *memoize.Memoizer = memoize.NewMemoizer(10*time.Minute, 20*time.Minute)
+	change_percent = prometheus.NewDesc( //nolint:golint,revive
+		prometheus.BuildFQName(namespace, "", "change_percent"),
+		"Changed percent since last close price.",
+		[]string{"symbol", "name", "exchange", "currency"}, nil,
+	)
+
+	volume = prometheus.NewDesc( //nolint:golint,revive
+		prometheus.BuildFQName(namespace, "", "volume"),
+		"Trading volume during the bar.",
+		[]string{"symbol", "name", "exchange", "currency"}, nil,
+	)
+
+	previous_close_price = prometheus.NewDesc( //nolint:golint,revive
+		prometheus.BuildFQName(namespace, "", "previous_close_price"),
+		"Closing price of the previous day.",
+		[]string{"symbol", "name", "exchange", "currency"}, nil,
+	)
+
+	price = prometheus.NewDesc( //nolint:golint,revive
+		prometheus.BuildFQName(namespace, "", "price"),
+		"Real-time or the latest available price.",
+		[]string{"symbol", "name", "exchange", "currency"}, nil,
+	)
+
+	httpRequestsTotal = prometheus.NewCounterVec(prometheus.CounterOpts{
+		Namespace: namespace,
+		Name:      "http_requests_total",
+		Help:      "The total number of requests labeled by response code",
+	},
+		[]string{"symbol", "name", "exchange", "currency"},
+	)
 )
 
-// collector holds data for a prometheus collector.
-type collector struct {
-	apikey  string
-	limit   int
+// Collector collects Quote Metrics
+type Collector struct {
+	client  *TwelvedataClient
 	symbols []string
 }
 
-// newCollector returns a new collector object with parsed data from the URL object.
-func newCollector(myURL *url.URL, apiKey string, limit int) (collector, error) {
-	var symbols []string
-
-	// The typical query is formatted as: ?symbols=AAA,BBB...&symbols=CCC,DDD...
-	// We fetch all symbols into a single slice.
-	querySymbols, exists := myURL.Query()["symbols"]
-	if !exists {
-		return collector{}, fmt.Errorf("missing symbols in the query")
+// newCollector returns an initialized exporter
+func newCollector(client *TwelvedataClient, symbols []string) *Collector {
+	return &Collector{
+		client:  client,
+		symbols: symbols,
 	}
-
-	for _, qValue := range querySymbols {
-		symbols = append(symbols, strings.Split(qValue, ",")...)
-	}
-
-	return collector{apiKey, limit, symbols}, nil
 }
 
 // Describe outputs description for prometheus timeseries.
-func (c *collector) Describe(ch chan<- *prometheus.Desc) {
-	// Must send one description, or the registry panics.
-	ch <- prometheus.NewDesc("dummy", "dummy", nil, nil)
+func (c *Collector) Describe(ch chan<- *prometheus.Desc) {
+	ch <- change_price
+	ch <- change_percent
+	ch <- volume
+	ch <- price
+	httpRequestsTotal.Describe(ch)
 }
 
-// Collect retrieves quote data and outputs Prometheus compatible time series on
-// the output channel.
-func (c *collector) Collect(ch chan<- prometheus.Metric) {
+// Collect retrieves quote data and outputs Prometheus compatible time series
+// on the output channel.
+func (c *Collector) Collect(ch chan<- prometheus.Metric) {
 	queryCount.Inc()
 
 	for _, symbol := range c.symbols {
-		quote, cached := c.fetchQuoteData(symbol)
+		quote, _ := c.client.GetQuote(symbol)
 		if quote == nil {
 			continue
 		}
 
-		ls := []string{"symbol", "name", "exchange", "currency"}
-		lvs := c.createLabelValues(symbol, quote)
-
-		changedPrice, _ := strconv.ParseFloat(quote.Change, 64)
-		changedPercent, _ := strconv.ParseFloat(quote.PercentChange, 64)
-		currentVolume, _ := strconv.ParseFloat(quote.Volume, 64)
-		previousClosePrice, _ := strconv.ParseFloat(quote.PreviousClose, 64)
-		currentPrice := previousClosePrice + changedPrice
-
-		c.logRetrievedData(symbol, cached, currentPrice)
-
-		c.sendPrometheusMetrics(ch, ls, lvs, changedPrice, changedPercent, currentVolume, currentPrice)
+		c.processMetrics(quote, ch)
 	}
 }
 
-// fetchQuoteData fetches quote data for a single symbol using the cachedFetcher.
-func (c *collector) fetchQuoteData(symbol string) (*Quote, bool) {
-	cachedFetcher := func() (interface{}, error) {
-		res, err := FetchQuote(symbol, c.apikey)
-		if err != nil {
-			errorCount.Inc()
-			log.Printf("Error looking up %s: %v\n", symbol, err)
-			return nil, nil
-		}
-		return res, nil
-	}
+func (c *Collector) processMetrics(quote *QuoteResponse, ch chan<- prometheus.Metric) {
+	isCached := false
 
-	start := time.Now()
-	qret, err, cached := cache.Memoize(symbol, cachedFetcher)
-	queryDuration.Observe(time.Since(start).Seconds())
+	labels := c.createLabelValues(quote.Symbol, quote)
+	changedPrice, _ := strconv.ParseFloat(quote.Change, 64)
+	changedPercent, _ := strconv.ParseFloat(quote.PercentChange, 64)
+	currentVolume, _ := strconv.ParseFloat(quote.Volume, 64)
+	previousClosePrice, _ := strconv.ParseFloat(quote.PreviousClose, 64)
 
-	if err != nil {
-		errorCount.Inc()
-		log.Printf("Error looking up %s: %v\n", symbol, err)
-		return nil, false
-	}
+	ch <- prometheus.MustNewConstMetric(change_price, prometheus.GaugeValue, changedPrice, labels...)
+	ch <- prometheus.MustNewConstMetric(change_percent, prometheus.GaugeValue, changedPercent, labels...)
+	ch <- prometheus.MustNewConstMetric(volume, prometheus.GaugeValue, currentVolume, labels...)
+	ch <- prometheus.MustNewConstMetric(previous_close_price, prometheus.GaugeValue, previousClosePrice, labels...)
+	ch <- prometheus.MustNewConstMetric(price, prometheus.GaugeValue, previousClosePrice+changedPrice, labels...)
 
-	quote, ok := qret.(*Quote)
-	if !ok {
-		errorCount.Inc()
-		log.Printf("Invalid quote data for %s: %v\n", symbol, qret)
-		return nil, false
-	}
+	httpRequestsTotal.Collect(ch)
 
-	return quote, cached
+	// TODO: Implement caching. isCached is always false.
+	c.logRetrievedData(quote.Symbol, isCached, previousClosePrice+changedPrice)
 }
 
 // createLabelValues creates label values for a given symbol and its quote data.
-func (c *collector) createLabelValues(symbol string, quote *Quote) []string {
+func (c *Collector) createLabelValues(symbol string, quote *QuoteResponse) []string {
 	return []string{symbol, quote.Name, quote.Exchange, quote.Currency}
 }
 
 // logRetrievedData logs the retrieved data for a given symbol and its quote data.
-func (c *collector) logRetrievedData(symbol string, cached bool, currentPrice float64) {
+func (c *Collector) logRetrievedData(symbol string, cached bool, currentPrice float64) {
 	cachedMsg := ""
 	if cached {
 		cachedMsg = " (cached)"
 	}
 
-	log.Printf("Retrieved %s%s, price: %f\n", symbol, cachedMsg, currentPrice)
-
-	// Temporary rate-limit
-	if c.limit != 0 {
-		time.Sleep(60 * time.Second / time.Duration(c.limit))
-	}
-}
-
-// sendPrometheusMetrics sends Prometheus metrics for a given symbol and its quote data.
-func (c *collector) sendPrometheusMetrics(
-	ch chan<- prometheus.Metric, ls, lvs []string, changedPrice, changedPercent, currentVolume, currentPrice float64,
-) {
-	ch <- prometheus.MustNewConstMetric(
-		prometheus.NewDesc("twelvedata_stock_change_price", "Changed price since last close price.", ls, nil),
-		prometheus.GaugeValue,
-		changedPrice,
-		lvs...,
-	)
-
-	ch <- prometheus.MustNewConstMetric(
-		prometheus.NewDesc("twelvedata_stock_change_percent", "Changed percent since last close price.", ls, nil),
-		prometheus.GaugeValue,
-		changedPercent,
-		lvs...,
-	)
-
-	ch <- prometheus.MustNewConstMetric(
-		prometheus.NewDesc("twelvedata_stock_volume", "Trading volume during the bar.", ls, nil),
-		prometheus.GaugeValue,
-		currentVolume,
-		lvs...,
-	)
-
-	ch <- prometheus.MustNewConstMetric(
-		prometheus.NewDesc("twelvedata_stock_price", "Real-time or the latest available price.", ls, nil),
-		prometheus.GaugeValue,
-		currentPrice,
-		lvs...,
-	)
+	log.Infof("Retrieved %s%s, price: %f\n", symbol, cachedMsg, currentPrice)
 }
