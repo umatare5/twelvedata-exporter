@@ -13,8 +13,11 @@ This exporter allows a prometheus instance to monitor prices of stocks, ETFs, an
 ## Installation
 
 ```bash
-docker run ghcr.io/umatare5/twelvedata-exporter
+docker run -p 9341:9341 -e TWELVEDATA_API_KEY ghcr.io/umatare5/twelvedata-exporter
 ```
+
+- `-p`: Publish a container's port `9341/tcp`, to the host `9341/tcp`.
+- `-e`: Forward environment variables `TWELVEDATA_API_KEY` in a container.
 
 > [!Tip]
 > If you would like to use binaries, please download them from [release page](https://github.com/umatare5/twelvedata-exporter/releases).
@@ -31,7 +34,7 @@ USAGE:
    twelvedata-exporter COMMAND [options...]
 
 VERSION:
-   0.1.0
+   1.0.0
 
 COMMANDS:
    help, h  Shows a list of commands or help for one command
@@ -104,7 +107,16 @@ twelvedata_volume{currency="USD",exchange="NASDAQ",name="Alphabet Inc",symbol="G
 To refer to the usage, please access http://localhost:9341/ after starting the exporter.
 
 ```bash
-❯ ./twelvedata-exporter --twelvedata.api-key "foobarbaz0123456789abcdefghijklm"
+$ TWELVEDATA_API_KEY="foobarbaz"
+$ docker run -p 9341:9341 -e TWELVEDATA_API_KEY ghcr.io/umatare5/twelvedata-exporter
+INFO[0000] Listening on port 0.0.0.0:9341
+```
+
+or using a binary:
+
+```bash
+$ TWELVEDATA_API_KEY="foobarbaz"
+$ ./twelvedata-exporter
 INFO[0000] Listening on port 0.0.0.0:9341
 ```
 
