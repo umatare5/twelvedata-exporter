@@ -26,8 +26,8 @@ scrape_configs:
 
   - job_name: "twelvedata"
     metrics_path: /price
-    scrape_interval: 15m
-    scrape_timeout: 14m
+    scrape_interval: 60s
+    scrape_timeout: 50s
     params:
       symbols: # Free tier allows up to 8 symbols per minute
         - SPX   # S&P500
@@ -36,7 +36,16 @@ scrape_configs:
         - GOOGL # Google
         - AAPL  # Apple
         - AMZN  # Amazon
-        - FB    # Facebook
+        - META  # Facebook
         - VIX   # CBOE Volatility Index
     static_configs:
-      - targets: [localhost:9341]
+      - targets: [host.docker.internal:9341]
+
+# If you send metrics to Grafana Cloud, use the following configuration:
+#
+# remote_write:
+#   - url: https://your-username.grafana.net/api/prom/push
+#     basic_auth:
+#       username: 999999
+#       password: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx=
+#
