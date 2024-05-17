@@ -10,6 +10,13 @@ This exporter allows a prometheus instance to monitor prices of stocks, ETFs, an
 >
 > To access the Twelvedata API, you need an access token. Please register with [Twelvedata](https://twelvedata.com/) in advance and generate an access token by referring to [the official document: Getting Started - Authentication](https://twelvedata.com/docs#authentication).
 
+> [!Note]
+>
+> The Twelvedata API has some limitations based on the license. For example, API limit, accessible market and others. For the limitations, please refer to [twelvedata - Pricing](https://twelvedata.com/pricing) with following documents:
+>
+> - [Twelvedata Support - Credits](https://support.twelvedata.com/en/articles/5615854-credits)
+> - [Twelvedata Support - What are Level A, B, & C markets?](https://support.twelvedata.com/en/articles/5204151-what-are-level-a-b-c-markets)
+
 ## Installation
 
 ```bash
@@ -17,7 +24,7 @@ docker run -p 9341:9341 -e TWELVEDATA_API_KEY ghcr.io/umatare5/twelvedata-export
 ```
 
 - `-p`: Publish a container's port `9341/tcp`, to the host `9341/tcp`.
-- `-e`: Forward environment variables `TWELVEDATA_API_KEY` in a container.
+- `-e`: Forward environment variable `TWELVEDATA_API_KEY` into a container.
 
 > [!Tip]
 > If you would like to use binaries, please download them from [release page](https://github.com/umatare5/twelvedata-exporter/releases).
@@ -125,10 +132,6 @@ INFO[0000] Listening on port 0.0.0.0:9341
 Please refer to [prometheus.sample.yml#L27-L42](./prometheus.sample.yml#L27-L42).
 
 - To know how to write technical indicators as PromQL, please refer to [prometheus.rules.sample.yml](./prometheus.rules.sample.yml).
-
-> [!Tip]
->
-> The Twelvedata API has rate limits based on the license. Please adjust the `scrape_interval` and `scrape_timeout` to comply with these limits. For further the limits, please refer to [twelvedata - Pricing](https://twelvedata.com/pricing).
 
 ## Development
 
