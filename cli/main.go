@@ -65,7 +65,7 @@ func registerWebListenPortFlag() []cli.Flag {
 			Name:    config.WebListenPortFlagName,
 			Usage:   "Set port number",
 			Aliases: []string{"P"},
-			Value:   9341,
+			Value:   10016,
 		},
 	}
 }

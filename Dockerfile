@@ -17,6 +17,6 @@ FROM alpine
 WORKDIR /app
 COPY --from=builder /tmp/build/twelvedata-exporter .
 
-EXPOSE 9341
+EXPOSE 10016
 USER ${UID}
 ENTRYPOINT [ "./twelvedata-exporter" ]

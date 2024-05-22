@@ -39,7 +39,7 @@ scrape_configs:
         - META  # Facebook
         - VIX   # CBOE Volatility Index
     static_configs:
-      - targets: [host.docker.internal:9341]
+      - targets: [host.docker.internal:10016]
 
 # If you send metrics to Grafana Cloud, use the following configuration:
 #

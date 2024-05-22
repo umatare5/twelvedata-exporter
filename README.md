@@ -20,10 +20,10 @@ This exporter allows a prometheus instance to monitor prices of stocks, ETFs, an
 ## Installation
 
 ```bash
-docker run -p 9341:9341 -e TWELVEDATA_API_KEY ghcr.io/umatare5/twelvedata-exporter
+docker run -p 10016:10016 -e TWELVEDATA_API_KEY ghcr.io/umatare5/twelvedata-exporter
 ```
 
-- `-p`: Publish a container's port `9341/tcp`, to the host `9341/tcp`.
+- `-p`: Publish a container's port `10016/tcp`, to the host `10016/tcp`.
 - `-e`: Forward environment variable `TWELVEDATA_API_KEY` into a container.
 
 > [!Tip]
@@ -48,7 +48,7 @@ COMMANDS:
 
 GLOBAL OPTIONS:
    --web.listen-address value, -I value     Set IP address (default: "0.0.0.0")
-   --web.listen-port value, -P value        Set port number (default: 9341)
+   --web.listen-port value, -P value        Set port number (default: 10016)
    --web.scrape-path value, -p value        Set the path to expose metrics (default: "/price")
    --twelvedata.api-key value, -a value     Set key to use twelvedata API [$TWELVEDATA_API_KEY]
    --help, -h                               show help
@@ -111,12 +111,12 @@ twelvedata_volume{currency="USD",exchange="NASDAQ",name="Alphabet Inc",symbol="G
 
 ### Exporter
 
-To refer to the usage, please access http://localhost:9341/ after starting the exporter.
+To refer to the usage, please access http://localhost:10016/ after starting the exporter.
 
 ```bash
 $ TWELVEDATA_API_KEY="foobarbaz"
-$ docker run -p 9341:9341 -e TWELVEDATA_API_KEY ghcr.io/umatare5/twelvedata-exporter
-INFO[0000] Listening on port 0.0.0.0:9341
+$ docker run -p 10016:10016 -e TWELVEDATA_API_KEY ghcr.io/umatare5/twelvedata-exporter
+INFO[0000] Listening on port 0.0.0.0:10016
 ```
 
 or using a binary:
@@ -124,7 +124,7 @@ or using a binary:
 ```bash
 $ TWELVEDATA_API_KEY="foobarbaz"
 $ ./twelvedata-exporter
-INFO[0000] Listening on port 0.0.0.0:9341
+INFO[0000] Listening on port 0.0.0.0:10016
 ```
 
 ### Prometheus
@@ -143,7 +143,7 @@ The repository includes a ready to use `Dockerfile`. Run the following command t
 make image
 ```
 
-The new image is named as `$USER/twelvedata-exporter` and exports `9341/tcp` to your host.
+The new image is named as `$USER/twelvedata-exporter` and exports `10016/tcp` to your host.
 
 ### Release
 
