@@ -1,6 +1,6 @@
 # twelvedata-exporter
 
-![](https://github.com/umatare5/twelvedata-exporter/workflows/Go/badge.svg)
+![](https://github.com/umatare5/twelvedata-exporter/workflows/Go/badge.svg) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/umatare5/twelvedata-exporter/blob/main/LICENSE)
 
 twelvedata-exporter is a Prometheus Exporter to fetch quotes from Twelvedata API.
 
