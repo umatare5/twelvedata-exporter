@@ -17,7 +17,7 @@ This exporter allows a prometheus instance to monitor prices of stocks, ETFs, an
 > - [Twelvedata Support - Credits](https://support.twelvedata.com/en/articles/5615854-credits)
 > - [Twelvedata Support - What are Level A, B, & C markets?](https://support.twelvedata.com/en/articles/5204151-what-are-level-a-b-c-markets)
 
-## Installation
+## Quick Start
 
 ```bash
 docker run -p 10016:10016 -e TWELVEDATA_API_KEY ghcr.io/umatare5/twelvedata-exporter
