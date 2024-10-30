@@ -15,7 +15,7 @@ This exporter allows a prometheus instance to monitor prices of stocks, ETFs, an
 > The Twelvedata API has some limitations based on the license. For example, API limit, accessible market and others. For the limitations, please refer to [twelvedata - Pricing](https://twelvedata.com/pricing) with following documents:
 >
 > - [Twelvedata Support - Credits](https://support.twelvedata.com/en/articles/5615854-credits)
-> - [Stock Exchanges: Understand which stock exchanges are supported in details](https://support.twelvedata.com/en/collections/2787973-stock-exchanges)
+> - [Twelvedata Support - Stock Exchanges](https://support.twelvedata.com/en/collections/2787973-stock-exchanges)
 
 ## Quick Start
 
