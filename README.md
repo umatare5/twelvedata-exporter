@@ -2,7 +2,7 @@
 
 ![](https://github.com/umatare5/twelvedata-exporter/workflows/Go/badge.svg) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/umatare5/twelvedata-exporter/blob/main/LICENSE)
 
-twelvedata-exporter is a Prometheus Exporter to fetch quotes from Twelvedata API.
+controld-exporter is a third-party Prometheus Exporter for Twelvedata.
 
 This exporter allows a prometheus instance to monitor prices of stocks, ETFs, and mutual funds.
 
