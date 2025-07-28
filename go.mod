@@ -2,7 +2,7 @@ module github.com/umatare5/twelvedata-exporter
 
 go 1.22
 
-toolchain go1.24.4
+toolchain go1.24.5
 
 require (
 	github.com/jinzhu/configor v1.2.1
