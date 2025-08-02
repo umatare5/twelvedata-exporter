@@ -1,4 +1,4 @@
-// Package internal contains the implementation of this exporter.
+// Package internal provides the HTTP server implementation for the exporter.
 package internal
 
 import (
@@ -15,50 +15,51 @@ import (
 	"github.com/umatare5/twelvedata-exporter/log"
 )
 
-// Server struct
+// Server represents the HTTP server for the exporter.
 type Server struct {
-	ListenAddrAndPort string
-	ScrapePath        string
-	Client            *TwelvedataClient
+	Client *TwelvedataClient // Twelvedata API client
+	Config *config.Config    // Configuration for the server
 }
 
-// NewServer returns Twelvedata struct
+// NewServer initializes and returns a new Server instance.
 func NewServer(config *config.Config) (Server, error) {
 	return Server{
-		ListenAddrAndPort: config.WebListenAddress + ":" + strconv.Itoa(config.WebListenPort),
-		ScrapePath:        config.WebScrapePath,
-		Client:            NewTwelvedataClient(config.TwelvedataAPIKey),
+		Client: NewTwelvedataClient(config.TwelvedataAPIKey),
+		Config: config,
 	}, nil
 }
 
-// Start starts the server
+// Start configures and launches the HTTP server to serve metrics and help pages.
 func (s *Server) Start() {
 	reg := prometheus.NewRegistry()
 
-	// Add standard process and Go metrics.
+	// Register standard process and Go metrics.
 	reg.MustRegister(
 		collectors.NewProcessCollector(collectors.ProcessCollectorOpts{}),
 		collectors.NewGoCollector(),
 	)
 
-	// Register handlers.
+	// Register HTTP handlers.
 	http.HandleFunc("/", s.help)
-	http.HandleFunc(s.ScrapePath, func(w http.ResponseWriter, r *http.Request) {
+	http.HandleFunc(s.Config.WebScrapePath, func(w http.ResponseWriter, r *http.Request) {
 		s.priceHandler(w, r)
 	})
 
-	log.Infof("Listening on port %s", s.ListenAddrAndPort)
+	listenAddr := s.Config.WebListenAddress + ":" + strconv.Itoa(s.Config.WebListenPort)
+	log.Infof("Starting the Twelvedata exporter on %s", listenAddr)
 	srv := &http.Server{
-		Addr:         s.ListenAddrAndPort,
+		Addr:         listenAddr,
 		Handler:      nil,
-		ReadTimeout:  time.Second * 10,
-		WriteTimeout: time.Second * 10,
+		ReadTimeout:  time.Minute,
+		WriteTimeout: time.Minute,
 	}
-	log.Fatal(srv.ListenAndServe())
+	
+	if err := srv.ListenAndServe(); err != nil {
+		log.Fatal("Failed to start server: ", err)
+	}
 }
 
-// priceHandler handles the "/price" endpoint. It creates a new collector with
-// the URL and a new prometheus registry to use that collector.
+// priceHandler registers Prometheus metrics and serves them via HTTP.
 func (s *Server) priceHandler(w http.ResponseWriter, r *http.Request) {
 	// The typical query is formatted as: ?symbols=AAA,BBB...&symbols=CCC,DDD...
 	// We fetch all symbols into a single slice.
@@ -76,7 +77,7 @@ func (s *Server) priceHandler(w http.ResponseWriter, r *http.Request) {
 
 	registry := prometheus.NewRegistry()
 
-	// These will be collected every time the /stock or /fund endpoint is reached.
+	// Register the Twelvedata collector and metrics.
 	registry.MustRegister(
 		newCollector(s.Client, symbols),
 		queryCount,
@@ -84,18 +85,23 @@ func (s *Server) priceHandler(w http.ResponseWriter, r *http.Request) {
 		errorCount,
 	)
 
-	// Delegate http serving to Promethues client library, which will call collector.Collect.
-	h := promhttp.HandlerFor(registry, promhttp.HandlerOpts{})
+	// Serve metrics using Prometheus client library.
+	h := promhttp.HandlerFor(registry, promhttp.HandlerOpts{
+		ErrorHandling: promhttp.ContinueOnError,
+	})
 	h.ServeHTTP(w, r)
 }
 
-// help returns a help message for those using the root URL.
+// help generates and serves an HTML help page for the root URL.
 func (s *Server) help(w http.ResponseWriter, _ *http.Request) {
-	fmt.Fprintf(w, "<h1>Prometheus Twelvedta Exporter</h1>")
-	fmt.Fprintf(w, "<p>To fetch the price of quotes, your URL must be formatted as:</p>")
-	fmt.Fprintf(w, "http://%s/price?symbols=AAAA,BBBB,CCCC", s.ListenAddrAndPort)
-	fmt.Fprintf(w, "<p><b>Examples:</b></p>")
-	fmt.Fprintf(w, "<ul>")
+	listenAddrAndPort := s.Config.WebListenAddress + ":" + strconv.Itoa(s.Config.WebListenPort)
+
+	var builder strings.Builder
+	builder.WriteString("<h1>Prometheus Twelvedata Exporter</h1>")
+	builder.WriteString("<p>To fetch the price of quotes, your URL must be formatted as:</p>")
+	builder.WriteString(fmt.Sprintf("http://%s%s?symbols=AAAA,BBBB,CCCC", listenAddrAndPort, s.Config.WebScrapePath))
+	builder.WriteString("<p><b>Examples:</b></p>")
+	builder.WriteString("<ul>")
 
 	symbols := []string{
 		"GOOGL",
@@ -103,7 +109,12 @@ func (s *Server) help(w http.ResponseWriter, _ *http.Request) {
 	}
 
 	for _, symbol := range symbols {
-		fmt.Fprintf(w, "<li><a href=\"http://%s/price?symbols=%s\">", s.ListenAddrAndPort, symbol)
-		fmt.Fprintf(w, "http://%s/price?symbols=%s</a></li>", s.ListenAddrAndPort, symbol)
+		builder.WriteString(fmt.Sprintf("<li><a href=\"http://%s%s?symbols=%s\">", listenAddrAndPort, s.Config.WebScrapePath, symbol))
+		builder.WriteString(fmt.Sprintf("http://%s%s?symbols=%s</a></li>", listenAddrAndPort, s.Config.WebScrapePath, symbol))
+	}
+	builder.WriteString("</ul>")
+
+	if _, err := w.Write([]byte(builder.String())); err != nil {
+		log.Errorf("Error writing response: %v", err)
 	}
 }
