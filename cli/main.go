@@ -2,25 +2,25 @@
 package cli
 
 import (
-	"fmt"
+	"context"
+	"log"
 	"os"
 
 	"github.com/umatare5/twelvedata-exporter/config"
 	"github.com/umatare5/twelvedata-exporter/internal"
-	"github.com/urfave/cli/v2"
+	cli "github.com/urfave/cli/v3"
 )
 
 // Start is the entrypoint of this CLI
 func Start() {
-	cmd := &cli.App{
+	cmd := &cli.Command{
 		Name:      "twelvedata-exporter",
-		HelpName:  "Fetch quotes from Twelvedata API",
-		Usage:     "twelvedata-exporter",
+		Usage:     "Fetch quotes from Twelvedata API",
 		UsageText: "twelvedata-exporter COMMAND [options...]",
 		Version:   getVersion(),
 		Flags:     registerFlags(),
-		Action: func(ctx *cli.Context) error {
-			config := config.NewConfig(ctx)
+		Action: func(ctx context.Context, cli *cli.Command) error {
+			config := config.NewConfig(cli)
 			server, _ := internal.NewServer(&config)
 
 			server.Start()
@@ -29,10 +29,8 @@ func Start() {
 		},
 	}
 
-	err := cmd.Run(os.Args)
-	if err != nil {
-		fmt.Println(err)
-		return
+	if err := cmd.Run(context.Background(), os.Args); err != nil {
+		log.Fatal(err)
 	}
 }
 
@@ -89,7 +87,7 @@ func registerAPIKeyFlag() []cli.Flag {
 			Name:     config.TwelvedataAPIKeyFlagName,
 			Usage:    "Set key to use twelvedata API",
 			Aliases:  []string{"a"},
-			EnvVars:  []string{"TWELVEDATA_API_KEY"},
+			Sources:  cli.EnvVars("TWELVEDATA_API_KEY"),
 			Required: true,
 		},
 	}

@@ -6,7 +6,7 @@ import (
 	"log"
 
 	"github.com/jinzhu/configor"
-	"github.com/urfave/cli/v2"
+	cli "github.com/urfave/cli/v3"
 )
 
 // Config flag names
@@ -26,12 +26,12 @@ type Config struct {
 }
 
 // NewConfig returns Config struct
-func NewConfig(ctx *cli.Context) Config {
+func NewConfig(cli *cli.Command) Config {
 	config := Config{
-		WebListenAddress: ctx.String(WebListenAddressFlagName),
-		WebListenPort:    ctx.Int(WebListenPortFlagName),
-		WebScrapePath:    ctx.String(WebScrapePathFlagName),
-		TwelvedataAPIKey: ctx.String(TwelvedataAPIKeyFlagName),
+		WebListenAddress: cli.String(WebListenAddressFlagName),
+		WebListenPort:    int(cli.Int(WebListenPortFlagName)),
+		WebScrapePath:    cli.String(WebScrapePathFlagName),
+		TwelvedataAPIKey: cli.String(TwelvedataAPIKeyFlagName),
 	}
 
 	err := configor.New(&configor.Config{}).Load(&config)
