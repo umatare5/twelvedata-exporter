@@ -1,6 +1,7 @@
 # twelvedata-exporter
 
 ![GitHub Tag](https://img.shields.io/github/v/tag/umatare5/twelvedata-exporter?label=Latest%20version)
+[![Test and Build](https://github.com/umatare5/twelvedata-exporter/actions/workflows/go-test-build.yml/badge.svg?branch=main)](https://github.com/umatare5/twelvedata-exporter/actions/workflows/go-test-build.yml)
 [![Go Reference](https://pkg.go.dev/badge/umatare5/twelvedata-exporter.svg)](https://pkg.go.dev/github.com/umatare5/twelvedata-exporter)
 [![Go Report Card](https://goreportcard.com/badge/github.com/umatare5/twelvedata-exporter?style=flat-square)](https://goreportcard.com/report/github.com/umatare5/twelvedata-exporter)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/umatare5/twelvedata-exporter/blob/main/LICENSE)
