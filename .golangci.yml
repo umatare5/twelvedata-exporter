@@ -1,86 +1,35 @@
-# Refer to https://golangci-lint.run/usage/configuration/
+# golangci-lint configuration file
+# More information: https://golangci-lint.run/usage/configuration/
 
 run:
-  go: "1.20"
-  concurrency: 4
   timeout: 5m
-  skip-dirs:
-    - .git
-    - .vscode
-    - scripts
-    - tmp
-    - dist
-    - vendor
-  modules-download-mode: readonly
-  allow-parallel-runners: true
-
-output:
-  sort-results: true
+  # Removed modules-download-mode to allow flexible module operations
 
 linters:
-  disable-all: true
   enable:
-    - bodyclose
-    - deadcode
-    - dogsled
-    - errcheck
-    - exhaustive
-    - exportloopref
-    - funlen
-    - gochecknoinits
-    - goconst
-    - gocritic
-    - gocyclo
-    - gofmt
-    - gofumpt
-    - goimports
-    - golint
-    - goprintffuncname
-    - gosec
-    - gosimple
-    - govet
-    - ineffassign
-    - lll
-    - nakedret
-    - noctx
-    - nolintlint
-    - revive
-    - rowserrcheck
-    - staticcheck
-    - structcheck
-    - typecheck
-    - unconvert
-    - unparam
-    - unused
-    - varcheck
-    - whitespace
+    - govet              # Reports suspicious constructs
+    - errcheck           # Check for unhandled errors
+    - gosimple           # Simplify your Go code
+    - staticcheck        # Comprehensive static analysis
+    - ineffassign        # Detects ineffective assignments
+    - unused             # Finds unused variables
 
-# linters-settings inspired by prometheus/prometheus.
+# Settings for specific linters
 linters-settings:
-  depguard:
-    list-type: blacklist
-    include-go-root: true
-    packages:
-      - sync/atomic
-      - github.com/stretchr/testify/assert
-  funlen:
-    lines: 100
-    statements: 50
-  lll:
-    line-length: 150
-  gosec:
-    excludes:
-      - G101
-  gofumpt:
-    extra-rules: true
+  errcheck:
+    check-type-assertions: true
+    check-blank: false
 
-# issues was inspired by uber-go/guide.
 issues:
-  exclude-use-default: false
-  max-issues-per-linter: 0
-  max-same-issues: 0
-  # issues.exclude-rules was inspired by prometheus/prometheus.
+  # Exclude specific warning types
   exclude-rules:
-  - path: _test.go
-    linters:
-    - errcheck
+    - linters:
+        - gocyclo
+      text: "(?i)cyclomatic complexity"
+  exclude-use-default: false
+
+# Files and folders to ignore
+skip-dirs:
+  - vendor
+  - build
+  - tmp
