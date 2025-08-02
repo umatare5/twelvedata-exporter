@@ -53,7 +53,7 @@ func (s *Server) Start() {
 		ReadTimeout:  time.Minute,
 		WriteTimeout: time.Minute,
 	}
-	
+
 	if err := srv.ListenAndServe(); err != nil {
 		log.Fatal("Failed to start server: ", err)
 	}
