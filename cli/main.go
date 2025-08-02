@@ -17,7 +17,7 @@ func Start() {
 		HelpName:  "Fetch quotes from Twelvedata API",
 		Usage:     "twelvedata-exporter",
 		UsageText: "twelvedata-exporter COMMAND [options...]",
-		Version:   "1.0.1",
+		Version:   getVersion(),
 		Flags:     registerFlags(),
 		Action: func(ctx *cli.Context) error {
 			config := config.NewConfig(ctx)
