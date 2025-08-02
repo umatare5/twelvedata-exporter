@@ -1,22 +1,18 @@
-FROM golang:1-alpine AS builder
+# Dockerfile for twelvedata-exporter
 
-ARG UID=60000
-ARG TWELVEDATA_API_KEY
-ENV TWELVEDATA_API_KEY=$TWELVEDATA_API_KEY
+FROM scratch
 
-# Copy the repo contents into /tmp/build
-WORKDIR /tmp/build
-COPY . .
+# Copy ca-certificates for HTTPS requests to twelvedata-exporter controllers
+COPY --from=alpine:latest@sha256:4bcff63911fcb4448bd4fdacec207030997caf25e9bea4045fa6c8c44de311d1 /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 
-RUN cd /tmp/build && \
-    go mod download && \
-    go build
+# Copy the pre-built binary from GoReleaser
+COPY twelvedata-exporter /twelvedata-exporter
 
-# Build the small image
-FROM alpine
-WORKDIR /app
-COPY --from=builder /tmp/build/twelvedata-exporter .
+# Create a non-root user (using numeric ID for scratch image)
+USER 65534:65534
 
-EXPOSE 10016
-USER ${UID}
-ENTRYPOINT [ "./twelvedata-exporter" ]
+# Set the entrypoint
+ENTRYPOINT ["/twelvedata-exporter"]
+
+# Default command shows help
+CMD ["--help"]
