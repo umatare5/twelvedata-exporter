@@ -4,7 +4,7 @@
 
   <h1>twelvedata-exporter</h1>
 
-  <p>twelvedata-exporter is a third-party Prometheus Exporter for Twelvedata.</p>
+  <p>A third-party Prometheus Exporter for Twelvedata.</p>
 
   <p>
     <img alt="GitHub Tag" src="https://img.shields.io/github/v/tag/umatare5/twelvedata-exporter?label=Latest%20version" />
