@@ -1,12 +1,24 @@
-# twelvedata-exporter
+<div align="center">
 
-![GitHub Tag](https://img.shields.io/github/v/tag/umatare5/twelvedata-exporter?label=Latest%20version)
-[![Test and Build](https://github.com/umatare5/twelvedata-exporter/actions/workflows/go-test-build.yml/badge.svg?branch=main)](https://github.com/umatare5/twelvedata-exporter/actions/workflows/go-test-build.yml)
-[![Go Reference](https://pkg.go.dev/badge/umatare5/twelvedata-exporter.svg)](https://pkg.go.dev/github.com/umatare5/twelvedata-exporter)
-[![Go Report Card](https://goreportcard.com/badge/github.com/umatare5/twelvedata-exporter?style=flat-square)](https://goreportcard.com/report/github.com/umatare5/twelvedata-exporter)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/umatare5/twelvedata-exporter/blob/main/LICENSE)
+<img src="docs/assets/logo.png" width="200px"/>
 
-twelvedata-exporter is a third-party Prometheus Exporter for Twelvedata.
+  <h1>twelvedata-exporter</h1>
+
+  <p>twelvedata-exporter is a third-party Prometheus Exporter for Twelvedata.</p>
+
+  <p>
+    <img alt="GitHub Tag" src="https://img.shields.io/github/v/tag/umatare5/twelvedata-exporter?label=Latest%20version" />
+    <a href="https://github.com/umatare5/twelvedata-exporter/actions/workflows/go-test-build.yml"><img alt="Test and Build" src="https://github.com/umatare5/twelvedata-exporter/actions/workflows/go-test-build.yml/badge.svg?branch=main" /></a>
+    <img alt="Test Coverage" src="docs/assets/coverage.svg" />
+    <a href="https://goreportcard.com/badge/github.com/umatare5/twelvedata-exporter?style=flat-square"><img alt="Go Report Card" src="https://goreportcard.com/report/github.com/umatare5/twelvedata-exporter" /></a>
+    <a href="https://pkg.go.dev/github.com/umatare5/twelvedata-exporter@main"><img alt="Go Reference" src="https://pkg.go.dev/badge/umatare5/twelvedata-exporter.svg" /></a>
+    <a href="https://www.bestpractices.dev/projects/10969"><img alt="OpenSSF Best Practices" src="https://www.bestpractices.dev/projects/10969/badge" /></a>
+    <a href="./LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/License-MIT-yellow.svg" /></a>
+  </p>
+
+</div>
+
+## Overview
 
 This exporter allows a prometheus instance to monitor prices of stocks, ETFs, and mutual funds.
 
