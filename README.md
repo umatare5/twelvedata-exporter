@@ -182,15 +182,11 @@ Run the release workflow.
 4. Rebase your local changes against the master branch
 5. Create a new Pull Request
 
-## Licence
-
-[MIT](LICENSE)
-
-## Author
-
-[umatare5](https://github.com/umatare5)
-
 ## Acknowledgements
 
 I used to use [Marco Paganini](https://github.com/marcopaganini)'s [quotes-exporter](https://github.com/marcopaganini/quotes-exporter) before. However, due to changes in the external endpoint, that exporter was broken and archived.
 Now, I built this exporter taking Marco's exporter as a reference. My thanks to Marco the predecessor, and [Tristan Colgate-McFarlane](https://github.com/tcolgate) the creator of [yquotes-exporter](https://github.com/tcolgate/yquotes_exporter) who preceded Marco.
+
+## Licence
+
+[MIT](LICENSE)
