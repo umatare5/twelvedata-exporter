@@ -117,7 +117,7 @@ release:
     docker run --rm ghcr.io/umatare5/twelvedata-exporter:{{ .Tag }} --help
 
     # With environment variables
-    docker run --rm -e CTRLD_API_KEY ghcr.io/umatare5/twelvedata-exporter:{{ .Tag }} command
+    docker run --rm -e TWELVEDATA_API_KEY ghcr.io/umatare5/twelvedata-exporter:{{ .Tag }} command
     ```
 
     ### 📦 Binary Installation
