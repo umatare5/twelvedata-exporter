@@ -11,6 +11,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/collectors"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
+
 	"github.com/umatare5/twelvedata-exporter/config"
 	"github.com/umatare5/twelvedata-exporter/log"
 )
@@ -22,10 +23,10 @@ type Server struct {
 }
 
 // NewServer initializes and returns a new Server instance.
-func NewServer(config *config.Config) (Server, error) {
+func NewServer(cfg *config.Config) (Server, error) {
 	return Server{
-		Client: NewTwelvedataClient(config.TwelvedataAPIKey),
-		Config: config,
+		Client: NewTwelvedataClient(cfg.TwelvedataAPIKey),
+		Config: cfg,
 	}, nil
 }
 
@@ -99,7 +100,7 @@ func (s *Server) help(w http.ResponseWriter, _ *http.Request) {
 	var builder strings.Builder
 	builder.WriteString("<h1>Prometheus Twelvedata Exporter</h1>")
 	builder.WriteString("<p>To fetch the price of quotes, your URL must be formatted as:</p>")
-	builder.WriteString(fmt.Sprintf("http://%s%s?symbols=AAAA,BBBB,CCCC", listenAddrAndPort, s.Config.WebScrapePath))
+	fmt.Fprintf(&builder, "http://%s%s?symbols=AAAA,BBBB,CCCC", listenAddrAndPort, s.Config.WebScrapePath)
 	builder.WriteString("<p><b>Examples:</b></p>")
 	builder.WriteString("<ul>")
 
@@ -109,8 +110,14 @@ func (s *Server) help(w http.ResponseWriter, _ *http.Request) {
 	}
 
 	for _, symbol := range symbols {
-		builder.WriteString(fmt.Sprintf("<li><a href=\"http://%s%s?symbols=%s\">", listenAddrAndPort, s.Config.WebScrapePath, symbol))
-		builder.WriteString(fmt.Sprintf("http://%s%s?symbols=%s</a></li>", listenAddrAndPort, s.Config.WebScrapePath, symbol))
+		fmt.Fprintf(
+			&builder,
+			"<li><a href=\"http://%s%s?symbols=%s\">",
+			listenAddrAndPort,
+			s.Config.WebScrapePath,
+			symbol,
+		)
+		fmt.Fprintf(&builder, "http://%s%s?symbols=%s</a></li>", listenAddrAndPort, s.Config.WebScrapePath, symbol)
 	}
 	builder.WriteString("</ul>")
 

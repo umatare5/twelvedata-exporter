@@ -10,11 +10,12 @@ import (
 	"time"
 
 	"github.com/prometheus/client_golang/prometheus"
+
 	"github.com/umatare5/twelvedata-exporter/log"
 )
 
 var (
-	// These are metrics for the collector itself
+	// These are metrics for the collector itself.
 	queryDuration = prometheus.NewSummary(
 		prometheus.SummaryOpts{
 			Name: "twelvedata_query_duration_seconds",
@@ -35,18 +36,18 @@ var (
 	)
 )
 
-// TwelvedataGatherer is an interface for Twelvedata API
+// TwelvedataGatherer is an interface for Twelvedata API.
 type TwelvedataGatherer interface {
 	GetQuote(symbol string) (float64, error)
 }
 
-// TwelvedataClient is a client for Twelvedata API
+// TwelvedataClient is a client for Twelvedata API.
 type TwelvedataClient struct {
 	baseURL string
 	apiKey  string
 }
 
-// QuoteResponse is a response from twelvedata Quote endpoint
+// QuoteResponse is a response from twelvedata Quote endpoint.
 type QuoteResponse struct {
 	Symbol        string       `json:"symbol"`
 	Name          string       `json:"name"`
@@ -86,17 +87,20 @@ func NewTwelvedataClient(apiKey string) *TwelvedataClient {
 	}
 }
 
+// apiRequestTimeout bounds each request to the Twelvedata API.
+const apiRequestTimeout = 10 * time.Second
+
 // GetQuote sends GET request to Twelvedata API.
 func (t *TwelvedataClient) GetQuote(symbol string) (*QuoteResponse, error) {
 	client := &http.Client{
-		Timeout: time.Second * 10,
+		Timeout: apiRequestTimeout,
 	}
 
 	req, err := http.NewRequestWithContext(
 		context.Background(),
-		"GET",
+		http.MethodGet,
 		fmt.Sprintf(t.baseURL+"/quote?symbol=%s&apikey=%s", symbol, t.apiKey),
-		nil,
+		http.NoBody,
 	)
 	if err != nil {
 		return nil, err

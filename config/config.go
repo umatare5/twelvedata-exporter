@@ -3,21 +3,22 @@ package config
 
 import (
 	"errors"
-	"log"
 
 	"github.com/jinzhu/configor"
 	cli "github.com/urfave/cli/v3"
+
+	"github.com/umatare5/twelvedata-exporter/log"
 )
 
-// Config flag names
+// Config flag names.
 const (
 	WebListenAddressFlagName = "web.listen-address"
 	WebListenPortFlagName    = "web.listen-port"
 	WebScrapePathFlagName    = "web.scrape-path"
-	TwelvedataAPIKeyFlagName = "twelvedata.api-key"
+	TwelvedataAPIKeyFlagName = "twelvedata.api-key" //nolint:gosec // Flag name, not a credential.
 )
 
-// Config struct
+// Config struct.
 type Config struct {
 	WebListenAddress string
 	WebListenPort    int
@@ -25,13 +26,13 @@ type Config struct {
 	TwelvedataAPIKey string
 }
 
-// NewConfig returns Config struct
-func NewConfig(cli *cli.Command) Config {
+// NewConfig returns Config struct.
+func NewConfig(cmd *cli.Command) Config {
 	config := Config{
-		WebListenAddress: cli.String(WebListenAddressFlagName),
-		WebListenPort:    int(cli.Int(WebListenPortFlagName)),
-		WebScrapePath:    cli.String(WebScrapePathFlagName),
-		TwelvedataAPIKey: cli.String(TwelvedataAPIKeyFlagName),
+		WebListenAddress: cmd.String(WebListenAddressFlagName),
+		WebListenPort:    cmd.Int(WebListenPortFlagName),
+		WebScrapePath:    cmd.String(WebScrapePathFlagName),
+		TwelvedataAPIKey: cmd.String(TwelvedataAPIKeyFlagName),
 	}
 
 	err := configor.New(&configor.Config{}).Load(&config)
@@ -72,7 +73,7 @@ func isValidWebScrapePathFlag(_ string) error {
 
 func isValidTwelvedataAPIKeyFlag(apikey string) error {
 	if apikey == "" {
-		return errors.New("Environment variable 'TWELVEDATA_API_KEY' is not set")
+		return errors.New("environment variable 'TWELVEDATA_API_KEY' is not set")
 	}
 
 	return nil
