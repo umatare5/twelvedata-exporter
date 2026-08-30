@@ -3,15 +3,16 @@ package cli
 
 import (
 	"context"
-	"log"
 	"os"
+
+	cli "github.com/urfave/cli/v3"
 
 	"github.com/umatare5/twelvedata-exporter/config"
 	"github.com/umatare5/twelvedata-exporter/internal"
-	cli "github.com/urfave/cli/v3"
+	"github.com/umatare5/twelvedata-exporter/log"
 )
 
-// Start is the entrypoint of this CLI
+// Start is the entrypoint of this CLI.
 func Start() {
 	cmd := &cli.Command{
 		Name:      "twelvedata-exporter",
@@ -19,9 +20,12 @@ func Start() {
 		UsageText: "twelvedata-exporter COMMAND [options...]",
 		Version:   getVersion(),
 		Flags:     registerFlags(),
-		Action: func(ctx context.Context, cli *cli.Command) error {
-			config := config.NewConfig(cli)
-			server, _ := internal.NewServer(&config)
+		Action: func(_ context.Context, cmd *cli.Command) error {
+			config := config.NewConfig(cmd)
+			server, err := internal.NewServer(&config)
+			if err != nil {
+				return err
+			}
 
 			server.Start()
 
@@ -34,7 +38,7 @@ func Start() {
 	}
 }
 
-// registerFlags returns global flags
+// registerFlags returns global flags.
 func registerFlags() []cli.Flag {
 	flags := []cli.Flag{}
 	flags = append(flags, registerWebListenAddressFlag()...)
@@ -44,7 +48,7 @@ func registerFlags() []cli.Flag {
 	return flags
 }
 
-// registerWebListenAddressFlag
+// registerWebListenAddressFlag.
 func registerWebListenAddressFlag() []cli.Flag {
 	return []cli.Flag{
 		&cli.StringFlag{
@@ -56,7 +60,7 @@ func registerWebListenAddressFlag() []cli.Flag {
 	}
 }
 
-// registerWebListenPortFlag
+// registerWebListenPortFlag.
 func registerWebListenPortFlag() []cli.Flag {
 	return []cli.Flag{
 		&cli.IntFlag{
@@ -68,7 +72,7 @@ func registerWebListenPortFlag() []cli.Flag {
 	}
 }
 
-// registerWebScrapePathFlag
+// registerWebScrapePathFlag.
 func registerWebScrapePathFlag() []cli.Flag {
 	return []cli.Flag{
 		&cli.StringFlag{
@@ -80,7 +84,7 @@ func registerWebScrapePathFlag() []cli.Flag {
 	}
 }
 
-// registerAPIKeyFlag
+// registerAPIKeyFlag.
 func registerAPIKeyFlag() []cli.Flag {
 	return []cli.Flag{
 		&cli.StringFlag{
