@@ -2,7 +2,7 @@
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/assets/logo_dark.png" width="115px">
-  <img src="docs/assets/logo.png" width="115px">
+  <img alt="twelvedata-exporter logo" src="docs/assets/logo.png" width="115px">
 </picture>
 
   <h1>twelvedata-exporter</h1>
@@ -92,7 +92,8 @@ This exporter returns following metrics:
 | `twelvedata_previous_close_price` | Closing price of the previous day.       | Gauge | `170.34`        |
 | `twelvedata_volume`               | Trading volume during the bar.           | Gauge | `1.5206856e+07` |
 
-<details><summary><u>Click to show full metrics</u></summary><p>
+<details>
+<summary>Click to show full metrics</summary>
 
 ```plain
 # HELP twelvedata_change_percent Changed percent since last close price.
@@ -122,13 +123,13 @@ twelvedata_query_duration_seconds_count 0
 twelvedata_volume{currency="USD",exchange="NASDAQ",name="Alphabet Inc",symbol="GOOGL"} 1.5206856e+07
 ```
 
-</p></details>
+</details>
 
 ## Usage
 
 ### Exporter
 
-To refer to the usage, please access http://localhost:10016/ after starting the exporter.
+To refer to the usage, please access <http://localhost:10016/> after starting the exporter.
 
 ```bash
 $ TWELVEDATA_API_KEY="foobarbaz"
@@ -176,7 +177,7 @@ Run the release workflow.
 
 ## Contribution
 
-1. Fork ([https://github.com/umatare5/twelvedata-exporter/fork](https://github.com/umatare5/twelvedata-exporter/fork))
+1. Fork (<https://github.com/umatare5/twelvedata-exporter/fork>)
 2. Create a feature branch
 3. Commit your changes
 4. Rebase your local changes against the master branch
