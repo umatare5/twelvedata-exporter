@@ -4,6 +4,10 @@ Notable changes to the metric surface, one section per release, listing the pull
 
 ## [Unreleased]
 
+## [v1.2.1]
+
+- [#60](https://github.com/umatare5/twelvedata-exporter/pull/60) — Start the exporter when the container runs without arguments
+
 ## [v1.2.0]
 
 - [#33](https://github.com/umatare5/twelvedata-exporter/pull/33) — Correct the env var name in the goreleaser release note
@@ -33,5 +37,6 @@ Notable changes to the metric surface, one section per release, listing the pull
 - [#58](https://github.com/umatare5/twelvedata-exporter/pull/58) — Migrate goreleaser Docker packaging to dockers_v2
 - [#59](https://github.com/umatare5/twelvedata-exporter/pull/59) — Update golangci-lint to v2.13.2 and bump version to v1.2.0
 
-[Unreleased]: https://github.com/umatare5/twelvedata-exporter/compare/v1.2.0...HEAD
+[Unreleased]: https://github.com/umatare5/twelvedata-exporter/compare/v1.2.1...HEAD
+[v1.2.1]: https://github.com/umatare5/twelvedata-exporter/releases/tag/v1.2.1
 [v1.2.0]: https://github.com/umatare5/twelvedata-exporter/releases/tag/v1.2.0
