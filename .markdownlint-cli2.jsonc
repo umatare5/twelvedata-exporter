@@ -37,6 +37,21 @@
       }
     },
     {
+      "filter": ["CHANGELOG.md"],
+      "combine": "merge",
+      "config": {
+        // Release headings accrue and this repository opens each one directly as
+        // `## [vX.Y.Z]`, so only the title is pinned
+        "MD043": {
+          "match_case": true,
+          "headings": [
+            "# Changelog",
+            "*"
+          ]
+        }
+      }
+    },
+    {
       "filter": ["README.md"],
       "combine": "merge",
       "config": {

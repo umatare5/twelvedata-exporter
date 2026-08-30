@@ -41,6 +41,7 @@ archives:
   - name_template: '{{ .ProjectName }}-v{{ .Version }}_{{ .Os }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}'
     files:
       - "README.md"
+      - "CHANGELOG.md"
       - "prometheus.sample.yml"
       - "prometheus.rules.sample.yml"
       - "LICENSE"
@@ -112,6 +113,7 @@ release:
     ### 📚 Documentation
 
     - [README](https://github.com/umatare5/twelvedata-exporter/blob/{{ .Tag }}/README.md)
+    - [CHANGELOG](https://github.com/umatare5/twelvedata-exporter/blob/{{ .Tag }}/CHANGELOG.md)
     - [Container Registry](https://github.com/umatare5/twelvedata-exporter/pkgs/container/twelvedata-exporter)
 
 # Generate checksums for source archives
