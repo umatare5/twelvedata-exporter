@@ -24,10 +24,21 @@
 
 ## Setup and Commands
 
-- `go build ./...` — Build all packages
-- `go run ./cmd` — Run the exporter locally
-- `golangci-lint run` — Lint (see [.golangci.yml](.golangci.yml)); install per <https://golangci-lint.run/docs/welcome/install/local/>
-- `make image` — Build the Docker image (see [Makefile](Makefile))
+Install required tools (one-time):
+
+- `go install gotest.tools/gotestsum@latest`
+- `golangci-lint` — See <https://golangci-lint.run/docs/welcome/install/local/>
+- `make pre-commit-install` wires `no-commit-to-main`, `golangci-lint`, `actionlint`, `gitleaks` and `markdownlint-cli2` (see [.pre-commit-config.yaml](.pre-commit-config.yaml))
+
+Make targets ([Makefile](Makefile)):
+
+- `make build` — Build the binary into `tmp/twelvedata-exporter`
+- `make lint` — `golangci-lint run` + `go mod tidy`
+- `make test-unit` — Run unit tests via `gotestsum` with coverage
+- `make test-unit-coverage` — Generate HTML report at `coverage/report.html`
+- `make clean` — Remove build artifacts and `.bak*` files
+- `make image` — Build the Docker image (`$USER/twelvedata-exporter`)
+- `make pre-commit-install` / `pre-commit-test` / `pre-commit-uninstall` — Manage the pre-commit hooks
 
 ## Code Style
 
@@ -37,7 +48,7 @@
 
 ## Testing Instructions
 
-- Run `go build ./...` and `go test ./...` before committing.
+- Run `make build` and `make test-unit` before committing.
 - Place tests next to code under test (`*_test.go`). The repository has no unit tests yet.
 
 ## Commits and PRs

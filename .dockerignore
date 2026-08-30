@@ -1,6 +1,9 @@
 .*
-Dockerfile*
-Makefile*
-.git*
-*.md
+!go.mod
+!go.sum
+!cmd/
+!cli/
+!config/
+!internal/
+!log/
 twelvedata-exporter
