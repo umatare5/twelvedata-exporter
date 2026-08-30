@@ -43,6 +43,12 @@ docker run -p 10016:10016 -e TWELVEDATA_API_KEY ghcr.io/umatare5/twelvedata-expo
 - `-p`: Publish a container's port `10016/tcp`, to the host `10016/tcp`.
 - `-e`: Forward environment variable `TWELVEDATA_API_KEY` into a container.
 
+The published tags are `latest`, `vX`, `vX.Y` and `vX.Y.Z`. Each one is a multi-platform image covering `linux/amd64` and `linux/arm64`, so Docker selects the architecture of the host.
+
+> [!Warning]
+>
+> The per-architecture tags — `latest-amd64`, `latest-arm64` and their `vX-`, `vX.Y-` and `vX.Y.Z-` counterparts — are **deprecated and no longer published**. They stopped receiving updates after v1.1.0, so `latest-amd64` and `v1-amd64` still resolve to v1.1.0 and never move again. Pull one of the tags above instead, which serves both architectures.
+
 > [!Tip]
 > If you would like to use binaries, please download them from [release page](https://github.com/umatare5/twelvedata-exporter/releases).
 >

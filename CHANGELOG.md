@@ -4,6 +4,8 @@ Notable changes to the metric surface, one section per release, listing the pull
 
 ## [Unreleased]
 
+- [#61](https://github.com/umatare5/twelvedata-exporter/pull/61) — Deprecate the per-architecture image tags
+
 ## [v1.2.1]
 
 - [#60](https://github.com/umatare5/twelvedata-exporter/pull/60) — Start the exporter when the container runs without arguments
