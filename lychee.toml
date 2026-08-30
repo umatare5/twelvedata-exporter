@@ -1,0 +1,12 @@
+include_fragments = "full"
+require_https = true
+exclude_all_private = true
+# support.twelvedata.com answers an automated request with 401, the docs page
+# renders its fragments with JavaScript so fragment checks cannot resolve, and
+# the release links name tags that exist only after the release lands.
+exclude = [
+  "^https://support\\.twelvedata\\.com/",
+  "^https://twelvedata\\.com/docs",
+  "^https://github\\.com/umatare5/twelvedata-exporter/releases/tag/",
+  "^https://github\\.com/umatare5/twelvedata-exporter/compare/",
+]
