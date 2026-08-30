@@ -17,86 +17,66 @@ before:
     - go mod verify
 
 builds:
-  - main: cmd/main.go
+  - main: ./cmd
     id: twelvedata-exporter
     binary: twelvedata-exporter
+    flags:
+      - -trimpath
     targets:
       - linux_amd64
       - linux_arm64
       - darwin_amd64
       - darwin_arm64
       - windows_amd64
+    env:
+      - CGO_ENABLED=0
     ldflags:
       - -s -w -X 'github.com/umatare5/twelvedata-exporter/cli.version={{ .Version }}'
+    hooks:
+      post:
+        # The setting is recorded in the binary, so this fails the release if cgo returns
+        - cmd: grep -q CGO_ENABLED=0 {{ .Path }}
 
 archives:
   - name_template: '{{ .ProjectName }}-v{{ .Version }}_{{ .Os }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}'
     files:
-      - "*.go"
-      - "*.md"
-      - "go.mod"
-      - "go.sum"
+      - "README.md"
+      - "prometheus.sample.yml"
+      - "prometheus.rules.sample.yml"
       - "LICENSE"
+    format_overrides:
+      - goos: windows
+        formats: ["zip"]
 
 # Docker configuration
-dockers:
-  - image_templates:
-      - "ghcr.io/umatare5/twelvedata-exporter:latest-amd64"
-      - "ghcr.io/umatare5/twelvedata-exporter:{{ .Tag }}-amd64"
-      - "ghcr.io/umatare5/twelvedata-exporter:v{{ .Major }}-amd64"
-      - "ghcr.io/umatare5/twelvedata-exporter:v{{ .Major }}.{{ .Minor }}-amd64"
-    use: buildx
-    build_flag_templates:
-      - "--platform=linux/amd64"
-      - "--label=org.opencontainers.image.title={{ .ProjectName }}"
-      - "--label=org.opencontainers.image.description=Prometheus Exporter for Twelve Data"
-      - "--label=org.opencontainers.image.url=https://github.com/umatare5/twelvedata-exporter"
-      - "--label=org.opencontainers.image.source=https://github.com/umatare5/twelvedata-exporter"
-      - "--label=org.opencontainers.image.version={{ .Version }}"
-      - "--label=org.opencontainers.image.created={{ .Date }}"
-      - "--label=org.opencontainers.image.revision={{ .FullCommit }}"
-      - "--label=org.opencontainers.image.licenses=MIT"
-    goarch: amd64
+dockers_v2:
+  - images:
+      - ghcr.io/umatare5/twelvedata-exporter
+    tags:
+      - latest
+      - "{{ .Tag }}"
+      - "v{{ .Major }}"
+      - "v{{ .Major }}.{{ .Minor }}"
+    platforms:
+      - linux/amd64
+      - linux/arm64
     ids:
       - twelvedata-exporter
-  - image_templates:
-      - "ghcr.io/umatare5/twelvedata-exporter:latest-arm64"
-      - "ghcr.io/umatare5/twelvedata-exporter:{{ .Tag }}-arm64"
-      - "ghcr.io/umatare5/twelvedata-exporter:v{{ .Major }}-arm64"
-      - "ghcr.io/umatare5/twelvedata-exporter:v{{ .Major }}.{{ .Minor }}-arm64"
-    use: buildx
-    build_flag_templates:
-      - "--platform=linux/arm64"
-      - "--label=org.opencontainers.image.title={{ .ProjectName }}"
-      - "--label=org.opencontainers.image.description=Prometheus Exporter for Twelve Data"
-      - "--label=org.opencontainers.image.url=https://github.com/umatare5/twelvedata-exporter"
-      - "--label=org.opencontainers.image.source=https://github.com/umatare5/twelvedata-exporter"
-      - "--label=org.opencontainers.image.version={{ .Version }}"
-      - "--label=org.opencontainers.image.created={{ .Date }}"
-      - "--label=org.opencontainers.image.revision={{ .FullCommit }}"
-      - "--label=org.opencontainers.image.licenses=MIT"
-    goarch: arm64
-    ids:
-      - twelvedata-exporter
-
-# Docker manifest for multi-platform images
-docker_manifests:
-  - name_template: "ghcr.io/umatare5/twelvedata-exporter:latest"
-    image_templates:
-      - "ghcr.io/umatare5/twelvedata-exporter:latest-amd64"
-      - "ghcr.io/umatare5/twelvedata-exporter:latest-arm64"
-  - name_template: "ghcr.io/umatare5/twelvedata-exporter:{{ .Tag }}"
-    image_templates:
-      - "ghcr.io/umatare5/twelvedata-exporter:{{ .Tag }}-amd64"
-      - "ghcr.io/umatare5/twelvedata-exporter:{{ .Tag }}-arm64"
-  - name_template: "ghcr.io/umatare5/twelvedata-exporter:v{{ .Major }}"
-    image_templates:
-      - "ghcr.io/umatare5/twelvedata-exporter:v{{ .Major }}-amd64"
-      - "ghcr.io/umatare5/twelvedata-exporter:v{{ .Major }}-arm64"
-  - name_template: "ghcr.io/umatare5/twelvedata-exporter:v{{ .Major }}.{{ .Minor }}"
-    image_templates:
-      - "ghcr.io/umatare5/twelvedata-exporter:v{{ .Major }}.{{ .Minor }}-amd64"
-      - "ghcr.io/umatare5/twelvedata-exporter:v{{ .Major }}.{{ .Minor }}-arm64"
+    # A prerelease must not move latest or the version tags. buildx builds and
+    # pushes in one step, so the whole configuration is disabled instead of
+    # skipping the push; snapshot builds stay enabled for local verification.
+    disable: '{{ and (not .IsSnapshot) (ne .Prerelease "") }}'
+    labels:
+      "org.opencontainers.image.title": "{{ .ProjectName }}"
+      "org.opencontainers.image.description": "Prometheus Exporter for Twelve Data"
+      "org.opencontainers.image.url": "https://github.com/umatare5/twelvedata-exporter"
+      "org.opencontainers.image.source": "https://github.com/umatare5/twelvedata-exporter"
+      "org.opencontainers.image.version": "{{ .Version }}"
+      "org.opencontainers.image.created": "{{ .Date }}"
+      "org.opencontainers.image.revision": "{{ .FullCommit }}"
+      "org.opencontainers.image.licenses": "MIT"
+    extra_files:
+      - "LICENSE"
 
 release:
   prerelease: auto
