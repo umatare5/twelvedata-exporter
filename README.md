@@ -165,7 +165,7 @@ The new image is named as `$USER/twelvedata-exporter` and exports `10016/tcp` to
 
 ### Release
 
-To release a new version, update the `VERSION` file and merge the change into `main`.
+To release a new version, add a `## [vX.Y.Z]` section to [CHANGELOG.md](CHANGELOG.md) with that version's release link, update the `VERSION` file to match, and merge both into `main`.
 
 A push to `main` touching `VERSION` runs the [release workflow](https://github.com/umatare5/twelvedata-exporter/actions/workflows/go-release.yml), which tags the commit and publishes the release in the same run.
 
