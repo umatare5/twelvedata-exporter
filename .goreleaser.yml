@@ -91,15 +91,17 @@ release:
     ### 🐳 Container Images
 
     ```bash
-    # Latest version
-    docker run --rm ghcr.io/umatare5/twelvedata-exporter:latest --help
-
-    # Specific version
+    # Show the flags
     docker run --rm ghcr.io/umatare5/twelvedata-exporter:{{ .Tag }} --help
 
-    # With environment variables
-    docker run --rm -e TWELVEDATA_API_KEY ghcr.io/umatare5/twelvedata-exporter:{{ .Tag }} command
+    # Run the exporter
+    docker run --rm -p 10016:10016 -e TWELVEDATA_API_KEY ghcr.io/umatare5/twelvedata-exporter:{{ .Tag }}
     ```
+
+    `latest`, `v{{ .Major }}`, `v{{ .Major }}.{{ .Minor }}` and `{{ .Tag }}` each serve `linux/amd64` and `linux/arm64`.
+
+    > [!WARNING]
+    > The per-architecture tags such as `latest-amd64` are deprecated and frozen at v1.1.0. Pull one of the tags above instead.
 
     ### 📦 Binary Installation
 
