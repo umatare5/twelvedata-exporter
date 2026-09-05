@@ -11,8 +11,8 @@ COPY --from=alpine:latest@sha256:28bd5fe8b56d1bd048e5babf5b10710ebe0bae67db86916
 # Copy the pre-built binary from GoReleaser
 COPY $TARGETPLATFORM/twelvedata-exporter /twelvedata-exporter
 
-# extra_files in .goreleaser.yml is what puts this in the build context
-COPY LICENSE /
+# extra_files in .goreleaser.yml is what puts these in the build context
+COPY LICENSE NOTICE /
 
 # Create a non-root user (using numeric ID for scratch image)
 USER 65534:65534

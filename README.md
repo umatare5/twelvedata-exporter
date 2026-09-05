@@ -169,4 +169,4 @@ I used to run [Marco Paganini](https://github.com/marcopaganini)'s [quotes-expor
 
 ## Licence
 
-MIT. See [`LICENSE`](LICENSE).
+MIT. The binary statically links Apache-2.0, MIT and BSD 3-Clause dependencies, whose notices are reproduced in [`NOTICE`](NOTICE) and shipped alongside [`LICENSE`](LICENSE) in every release archive and container image.

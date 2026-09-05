@@ -45,6 +45,7 @@ archives:
       - "prometheus.sample.yml"
       - "prometheus.rules.sample.yml"
       - "LICENSE"
+      - "NOTICE"
     format_overrides:
       - goos: windows
         formats: ["zip"]
@@ -78,6 +79,7 @@ dockers_v2:
       "org.opencontainers.image.licenses": "MIT"
     extra_files:
       - "LICENSE"
+      - "NOTICE"
 
 release:
   prerelease: auto
