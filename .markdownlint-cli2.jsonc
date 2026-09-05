@@ -14,7 +14,7 @@
     "MD050": { "style": "asterisk" },
     "MD054": { "url_inline": false },
     "MD055": { "style": "leading_and_trailing" },
-    "MD060": { "style": "aligned", "aligned_delimiter": true },
+    "MD060": { "style": "aligned", "aligned_delimiter": true }
   },
   "overrides": [
     {
@@ -25,23 +25,16 @@
           "match_case": true,
           "headings": [
             "# Repository Instructions",
-            "## Tech Stack",
-            "*",
-            "## Repository Structure",
-            "*",
-            "## Setup and Commands",
-            "*",
-            "## Code Style",
-            "*",
-            "## Testing Instructions",
-            "*",
-            "## Commits and PRs",
-            "*",
-            "## Domain Knowledge",
-            "*",
-          ],
-        },
-      },
+            "## Tech Stack", "*",
+            "## Repository Structure", "*",
+            "## Setup and Commands", "*",
+            "## Code Style", "*",
+            "## Testing Instructions", "*",
+            "## Commits and PRs", "*",
+            "## Domain Knowledge", "*"
+          ]
+        }
+      }
     },
     {
       "filter": ["CHANGELOG.md"],
@@ -50,9 +43,13 @@
         // Release headings accrue, so only the standing section is pinned
         "MD043": {
           "match_case": true,
-          "headings": ["# Changelog", "## [Unreleased]", "*"],
-        },
-      },
+          "headings": [
+            "# Changelog",
+            "## [Unreleased]",
+            "*"
+          ]
+        }
+      }
     },
     {
       "filter": ["CONTRIBUTING.md"],
@@ -62,16 +59,13 @@
           "match_case": true,
           "headings": [
             "# Contributing",
-            "## Commands",
-            "*",
-            "## Build",
-            "*",
-            "## Release",
-            "*",
-            "## Pull requests",
-          ],
-        },
-      },
+            "## Commands", "*",
+            "## Build", "*",
+            "## Release", "*",
+            "## Pull requests"
+          ]
+        }
+      }
     },
     {
       "filter": ["README.md"],
@@ -79,43 +73,25 @@
       "config": {
         // The logo, badges and title block are HTML; the heading they carry is an <h1>
         "MD033": {
-          "allowed_elements": [
-            "a",
-            "br",
-            "div",
-            "h1",
-            "img",
-            "p",
-            "picture",
-            "source",
-          ],
+          "allowed_elements": ["a", "br", "details", "div", "h1", "img", "p", "picture", "source", "summary"]
         },
         "MD041": { "allow_preamble": true },
         "MD043": {
           "match_case": true,
           "headings": [
-            "## Overview",
-            "*",
-            "## Quick Start",
-            "*",
-            "## Syntax",
-            "*",
-            "## Configuration",
-            "*",
-            "## Endpoints",
-            "*",
-            "## Metrics",
-            "*",
-            "## Use Cases",
-            "*",
-            "## Contributing",
-            "*",
-            "## Acknowledgement",
-            "*",
-            "## Licence",
-          ],
-        },
-      },
+            "## Overview", "*",
+            "## Quick Start", "*",
+            "## Syntax", "*",
+            "## Configuration", "*",
+            "## Endpoints", "*",
+            "## Metrics", "*",
+            "## Use Cases", "*",
+            "## Contributing", "*",
+            "## Acknowledgement", "*",
+            "## Licence"
+          ]
+        }
+      }
     },
     {
       "filter": ["SECURITY.md"],
@@ -125,20 +101,17 @@
           "match_case": true,
           "headings": [
             "# Security Policy",
-            "## Supported Versions",
-            "*",
-            "## Reporting a Vulnerability",
-            "*",
-            "## What to Include",
-            "*",
-            "## Scope",
-          ],
-        },
-      },
-    },
+            "## Supported Versions", "*",
+            "## Reporting a Vulnerability", "*",
+            "## What to Include", "*",
+            "## Scope"
+          ]
+        }
+      }
+    }
   ],
   "globs": ["**/*.md"],
   "gitignore": true,
   // Both are symlinks to AGENTS.md, which is linted on its own path
-  "ignores": [".claude/CLAUDE.md", ".github/copilot-instructions.md"],
+  "ignores": [".claude/CLAUDE.md", ".github/copilot-instructions.md"]
 }
