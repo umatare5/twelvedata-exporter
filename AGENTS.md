@@ -62,7 +62,13 @@ Make targets ([`Makefile`](Makefile)):
 
 ## Domain Knowledge
 
-- This repository ships a Prometheus exporter binary and container image for Twelve Data, not a reusable Go SDK.
-- The exporter listens on `0.0.0.0:10016` and serves metrics on `/price` by default; symbols are passed per scrape via `?symbols=`.
-- `TWELVEDATA_API_KEY` (or `--twelvedata.api-key`) is the primary runtime credential. Never log it or vendor responses that may expose account-sensitive details.
-- Favor low-cardinality labels and stable metric contracts over exposing every upstream field.
+These are the upstream behaviours every change to the client or the collector has to hold.
+
+- **Credits are spent per symbol, against a per-minute allowance.** `/quote` costs one credit per symbol, so folding symbols into one request would not lower the spend, and `/api_usage` reports `plan_limit` as requests per minute.
+- **No response header reports the remaining budget.** A reply carries no rate-limit, credit or `Retry-After` header, so the allowance left is visible only through `/api_usage`, which costs a credit of its own.
+- **An error arrives as a `code`/`message`/`status` object that decodes into the quote struct without failing.** The HTTP status mirrors `code` — a rejected key answers `401` and a missing `symbol` answers `404` — so the status is what separates an error from a quote. A body-only check sees empty strings instead.
+- **Every price field is a JSON string whose precision `dp` sets, five places by default.** Parse rather than assume, and expect absence. `volume`, `average_volume`, `mic_code` and `currency` are documented as unavailable for some instrument types. The `rolling_*` and `extended_*` fields appear only when the plan and the request parameters ask for them.
+- **`/quote` describes a bar, not a tick.** Its default `interval` is `1day`, and `change` and `percent_change` are taken against `previous_close`. The same bar repeats while `is_market_open` is false, so an overnight scrape holds a value rather than going absent.
+- **The strings the labels carry are the API's resolution, not the operator's input.** A bare `symbol` is ambiguous across venues, which `exchange`, `mic_code` and `country` narrow, and the reply echoes what it chose. Those strings drift, and a changed value renames every series carrying it. The documented `AAPL` example gives `mic_code` `XNAS` and `name` `Apple Inc`, where a live reply gives `XNGS` and `Apple Inc.`
+- **The key belongs in the `Authorization: apikey <key>` header the documentation recommends.** The `?apikey=` form the client sends today puts the credential in every proxy and access log along the path. Never log it, and never vendor a response that carries account-level detail.
+- **`apikey=demo` answers for a small set of symbols alone.** Everything else, a comma-separated list included, comes back `401`, so a demo request proves reachability rather than behaviour.
