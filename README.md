@@ -122,7 +122,7 @@ These series describe the exporter itself rather than the quotes it fetches. The
 | `twelvedata_query_duration_seconds` | Summary | Duration of queries to the upstream API |
 
 > [!IMPORTANT]
-> Read none of the three as a health signal without [`docs/health.md`](docs/health.md). `twelvedata_failed_queries_total` has no increment path and stays `0`, and `twelvedata_query_duration_seconds` observes an instant against itself, so its `_sum` stays `0` too.
+> Read none of the three as a health signal without [`docs/health.md`](docs/health.md). `twelvedata_failed_queries_total` has no increment path and stays `0`, and `twelvedata_query_duration_seconds` observes an instant against itself, so its `_sum` carries no latency either.
 
 ## Use Cases
 
