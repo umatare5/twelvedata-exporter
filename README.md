@@ -58,13 +58,26 @@ docker run -p 10016:10016 -e TWELVEDATA_API_KEY ghcr.io/umatare5/twelvedata-expo
 
 See [Prometheus Configuration](#prometheus-configuration) for the job and the recording rules.
 
-## Syntax
+## Flags
 
 `twelvedata-exporter --help` prints every flag, and [`docs/help.md`](docs/help.md) carries the same list.
 
+| Flag                   | Default   | Description                    |
+| :--------------------- | :-------- | :----------------------------- |
+| `--twelvedata.api-key` | —         | Twelve Data API key (required) |
+| `--web.listen-address` | `0.0.0.0` | Address the exporter binds to  |
+| `--web.listen-port`    | `10016`   | Port the exporter listens on   |
+| `--web.scrape-path`    | `/price`  | Path the metrics are served on |
+
 ## Configuration
 
-The API key is the one required setting. `TWELVEDATA_API_KEY` and `--twelvedata.api-key` carry the same value, but the flag reaches the process table where every account on the host reads it, so prefer the environment variable. The exporter exits at start-up when neither is set.
+This exporter reads one environment variable:
+
+| Environment Variable | Description                    |
+| :------------------- | :----------------------------- |
+| `TWELVEDATA_API_KEY` | Twelve Data API key (required) |
+
+`TWELVEDATA_API_KEY` and `--twelvedata.api-key` carry the same value, but the flag reaches the process table where every account on the host reads it, so prefer the environment variable. The exporter exits at start-up when neither is set.
 
 ## Endpoints
 
