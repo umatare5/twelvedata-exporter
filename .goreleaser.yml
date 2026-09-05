@@ -42,6 +42,7 @@ archives:
     files:
       - "README.md"
       - "CHANGELOG.md"
+      - "docs/*.md"
       - "prometheus.sample.yml"
       - "prometheus.rules.sample.yml"
       - "LICENSE"

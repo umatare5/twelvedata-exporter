@@ -94,6 +94,33 @@
       }
     },
     {
+      "filter": ["docs/health.md"],
+      "combine": "merge",
+      "config": {
+        "MD043": {
+          "match_case": true,
+          "headings": [
+            "# Exporter health",
+            "## Metrics", "*",
+            "## Specifications", "*"
+          ]
+        }
+      }
+    },
+    {
+      "filter": ["docs/help.md"],
+      "combine": "merge",
+      "config": {
+        "MD043": {
+          "match_case": true,
+          "headings": [
+            "# Help",
+            "## Notes", "*"
+          ]
+        }
+      }
+    },
+    {
       "filter": ["SECURITY.md"],
       "combine": "merge",
       "config": {

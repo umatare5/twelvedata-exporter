@@ -20,7 +20,7 @@
 - `internal/` — Collector, upstream Twelve Data client, and HTTP server
 - `log/` — logrus setup and logging helpers
 - `scripts/` — Hook helpers invoked by pre-commit, not by the build
-- `docs/` — Project assets (logos)
+- `docs/` — Reference pages the README delegates to, and the logo assets
 - `prometheus.sample.yml` / `prometheus.rules.sample.yml` — Prometheus scrape and rule examples
 
 ## Setup and Commands

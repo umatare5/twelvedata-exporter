@@ -47,9 +47,6 @@ The image declares `10016/tcp` without publishing it, so `-p` is what makes the 
 
 The published tags are `latest`, `vX`, `vX.Y` and `vX.Y.Z`. Each one is a multi-platform image covering `linux/amd64` and `linux/arm64`, so Docker selects the architecture of the host.
 
-> [!WARNING]
-> The per-architecture tags — `latest-amd64`, `latest-arm64` and their `vX-`, `vX.Y-` and `vX.Y.Z-` counterparts — are **deprecated and no longer published**. They stopped receiving updates after v1.1.0, so `latest-amd64` and `v1-amd64` still resolve to v1.1.0 and never move again. Pull one of the tags above instead, which serves both architectures.
-
 > [!TIP]
 > If you prefer using binaries, download them from the [Release](https://github.com/umatare5/twelvedata-exporter/releases).
 >
@@ -61,26 +58,7 @@ See [Prometheus Configuration](#prometheus-configuration) for the job and the re
 
 ## Syntax
 
-`twelvedata-exporter --help` prints every flag, and the transcript below is verbatim:
-
-```bash
-NAME:
-   twelvedata-exporter - Fetch quotes from Twelvedata API
-
-USAGE:
-   twelvedata-exporter COMMAND [options...]
-
-VERSION:
-   1.2.1
-
-GLOBAL OPTIONS:
-   --web.listen-address string, -I string  Set IP address (default: "0.0.0.0")
-   --web.listen-port int, -P int           Set port number (default: 10016)
-   --web.scrape-path string, -p string     Set the path to expose metrics (default: "/price")
-   --twelvedata.api-key string, -a string  Set key to use twelvedata API [$TWELVEDATA_API_KEY]
-   --help, -h                              show help
-   --version, -v                           print the version
-```
+`twelvedata-exporter --help` prints every flag, and [`docs/help.md`](docs/help.md) carries the same list.
 
 ## Configuration
 
@@ -91,7 +69,7 @@ The API key is the one required setting. `TWELVEDATA_API_KEY` and `--twelvedata.
 The exporter serves two endpoints:
 
 - `/` — landing page, which prints the query format when reached at <http://localhost:10016/>
-- `/price` — metrics endpoint, configurable via `--web.scrape-path`, which needs a `symbols` parameter
+- `/price` — metrics endpoint, configurable via `--web.scrape-path`
 
 > [!IMPORTANT]
 > The `symbols` parameter takes a comma-separated list and may repeat, and every occurrence is concatenated into one list. A request carrying none returns 200 with an empty body, so Prometheus counts that scrape as successful while every series is absent — alert on the absence of `twelvedata_price`, not on `up`.
@@ -122,7 +100,7 @@ The same four labels are attached to all five, and only `symbol` is chosen by th
 
 ### Exporter Health Metrics
 
-These series describe the exporter itself rather than the quotes it fetches, and they carry no labels:
+These series describe the exporter itself rather than the quotes it fetches. They carry no labels, and [`docs/health.md`](docs/health.md) carries the whole set with the reading each one needs.
 
 | Metric                              | Type    | Description                             |
 | :---------------------------------- | :------ | :-------------------------------------- |
@@ -130,11 +108,8 @@ These series describe the exporter itself rather than the quotes it fetches, and
 | `twelvedata_failed_queries_total`   | Counter | Count of failed queries                 |
 | `twelvedata_query_duration_seconds` | Summary | Duration of queries to the upstream API |
 
-> [!NOTE]
-> `twelvedata_queries_total` increments once per scrape rather than once per symbol, so the upstream request rate is that rate multiplied by the symbol count. `twelvedata_failed_queries_total` has no increment path in the current code and stays `0`, and `twelvedata_query_duration_seconds` observes an interval against the instant it takes, so its `_sum` stays `0`.
-
-> [!NOTE]
-> The scrape path publishes these series alone. The process and Go runtime collectors are registered on a registry no handler serves, so no `go_` or `process_` series reach a scrape.
+> [!IMPORTANT]
+> Read none of the three as a health signal without [`docs/health.md`](docs/health.md). `twelvedata_failed_queries_total` has no increment path and stays `0`, and `twelvedata_query_duration_seconds` observes an instant against itself, so its `_sum` stays `0` too.
 
 ## Use Cases
 
@@ -165,7 +140,7 @@ See [`CONTRIBUTING.md`](CONTRIBUTING.md) for the `make` targets, the Docker buil
 
 ## Acknowledgement
 
-I used to run [Marco Paganini](https://github.com/marcopaganini)'s [quotes-exporter](https://github.com/marcopaganini/quotes-exporter), which an upstream endpoint change broke before it was archived. This exporter is built on Marco's, and my thanks go to him and to [Tristan Colgate-McFarlane](https://github.com/tcolgate), whose [yquotes-exporter](https://github.com/tcolgate/yquotes_exporter) came first.
+I ran [Marco Paganini](https://github.com/marcopaganini)'s [quotes-exporter](https://github.com/marcopaganini/quotes-exporter) until an upstream endpoint change broke it and it was archived. This one builds on his, with thanks to him and to [Tristan Colgate-McFarlane](https://github.com/tcolgate), whose [yquotes-exporter](https://github.com/tcolgate/yquotes_exporter) came first.
 
 ## Licence
 
