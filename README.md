@@ -157,6 +157,6 @@ See [`CONTRIBUTING.md`](CONTRIBUTING.md) for the `make` targets, the Docker buil
 
 I ran [Marco Paganini](https://github.com/marcopaganini)'s [quotes-exporter](https://github.com/marcopaganini/quotes-exporter) until an upstream endpoint change broke it and it was archived. This one builds on his, with thanks to him and to [Tristan Colgate-McFarlane](https://github.com/tcolgate), whose [yquotes-exporter](https://github.com/tcolgate/yquotes_exporter) came first.
 
-## Licence
+## License
 
 MIT. The binary statically links Apache-2.0, MIT and BSD 3-Clause dependencies, whose notices are reproduced in [`NOTICE`](NOTICE) and shipped alongside [`LICENSE`](LICENSE) in every release archive and container image.
