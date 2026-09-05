@@ -1,18 +1,19 @@
 <div align="center">
 
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="docs/assets/logo_dark.png" width="115px">
-  <img alt="twelvedata-exporter logo" src="docs/assets/logo.png" width="115px">
-</picture>
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="./docs/assets/logo_dark.png" width="115px" />
+    <source media="(prefers-color-scheme: light)" srcset="./docs/assets/logo.png" width="115px" />
+    <img alt="twelvedata-exporter" src="./docs/assets/logo.png" width="115px" />
+  </picture>
 
   <h1>twelvedata-exporter</h1>
 
-  <p>A third-party Prometheus Exporter for Twelvedata.</p>
+  <p>A third-party Prometheus Exporter for Twelve Data.</p>
 
   <p>
     <img alt="GitHub Tag" src="https://img.shields.io/github/v/tag/umatare5/twelvedata-exporter?label=Latest%20version" />
     <a href="https://github.com/umatare5/twelvedata-exporter/actions/workflows/go-test-build.yml"><img alt="Test and Build" src="https://github.com/umatare5/twelvedata-exporter/actions/workflows/go-test-build.yml/badge.svg?branch=main" /></a>
-    <a href="https://goreportcard.com/badge/github.com/umatare5/twelvedata-exporter"><img alt="Go Report Card" src="https://goreportcard.com/badge/github.com/umatare5/twelvedata-exporter" /></a>
+    <a href="https://github.com/umatare5/twelvedata-exporter/actions/workflows/go-vulncheck.yml"><img alt="govulncheck" src="https://github.com/umatare5/twelvedata-exporter/actions/workflows/go-vulncheck.yml/badge.svg?branch=main" /></a><br>
     <a href="https://pkg.go.dev/github.com/umatare5/twelvedata-exporter@main"><img alt="Go Reference" src="https://pkg.go.dev/badge/umatare5/twelvedata-exporter.svg" /></a>
     <a href="./LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/License-MIT-yellow.svg" /></a>
   </p>
@@ -21,173 +22,126 @@
 
 ## Overview
 
-This exporter allows a prometheus instance to monitor prices of stocks, ETFs, and mutual funds.
+This exporter fetches quotes from [Twelve Data](https://twelvedata.com/) and serves them as Prometheus metrics.
 
-> [!Important]
->
-> To access the Twelvedata API, you need an access token. Please register with [Twelvedata](https://twelvedata.com/) in advance and generate an access token by referring to [the official document: Getting Started - Authentication](https://twelvedata.com/docs#authentication).
+- 💹 **Quote Surface**: Price, previous close, change, percent change and volume per symbol
+- 🔎 **Per-Scrape Symbols**: The symbol list travels in the scrape URL, not in a config file
+- ⏱️ **Bounded Upstream Calls**: Each request is capped at ten seconds, so a stall cannot hold a scrape open
+- 📐 **Indicator Examples**: RSI written as a recording rule, in [`prometheus.rules.sample.yml`](./prometheus.rules.sample.yml)
 
-> [!Note]
->
-> The Twelvedata API has some limitations based on the license. For example, API limit, accessible market and others. For the limitations, please refer to [twelvedata - Pricing](https://twelvedata.com/pricing) with following documents:
->
-> - [Twelvedata Support - Credits](https://support.twelvedata.com/en/articles/5615854-credits)
-> - [Twelvedata Support - Stock Exchanges](https://support.twelvedata.com/en/collections/2787973-stock-exchanges)
+> [!IMPORTANT]
+> The exporter refuses to start without an API key, so generate one first — see [Getting Started — Authentication](https://twelvedata.com/docs#authentication).
+
+> [!NOTE]
+> The exporter spends one credit per symbol per scrape, so the symbol count and the scrape interval together decide whether a plan holds. See [Pricing](https://twelvedata.com/pricing), [Credits](https://support.twelvedata.com/en/articles/5615854-credits) and [Stock Exchanges](https://support.twelvedata.com/en/collections/2787973-stock-exchanges).
 
 ## Quick Start
+
+### 1. Run the exporter with Docker
 
 ```bash
 docker run -p 10016:10016 -e TWELVEDATA_API_KEY ghcr.io/umatare5/twelvedata-exporter
 ```
 
-- `-p`: Publish a container's port `10016/tcp`, to the host `10016/tcp`.
-- `-e`: Forward environment variable `TWELVEDATA_API_KEY` into a container.
+The image declares `10016/tcp` without publishing it, so `-p` is what makes the exporter reachable, and `-e` forwards the key from the shell rather than baking it into the image.
 
 The published tags are `latest`, `vX`, `vX.Y` and `vX.Y.Z`. Each one is a multi-platform image covering `linux/amd64` and `linux/arm64`, so Docker selects the architecture of the host.
 
-> [!Warning]
+> [!TIP]
+> If you prefer using binaries, download them from the [Release](https://github.com/umatare5/twelvedata-exporter/releases).
 >
-> The per-architecture tags — `latest-amd64`, `latest-arm64` and their `vX-`, `vX.Y-` and `vX.Y.Z-` counterparts — are **deprecated and no longer published**. They stopped receiving updates after v1.1.0, so `latest-amd64` and `v1-amd64` still resolve to v1.1.0 and never move again. Pull one of the tags above instead, which serves both architectures.
+> **Supported Platform:** `linux_amd64`, `linux_arm64`, `darwin_amd64`, `darwin_arm64` and `windows_amd64`
 
-> [!Tip]
-> If you would like to use binaries, please download them from [release page](https://github.com/umatare5/twelvedata-exporter/releases).
->
-> - `linux_amd64`, `linux_arm64`, `darwin_amd64`, `darwin_arm64` and `windows_amd64` are supported.
+### 2. Scrape it
+
+See [Prometheus Configuration](#prometheus-configuration) for the job and the recording rules.
 
 ## Syntax
 
-```bash
-NAME:
-   Fetch quotes from Twelvedata API - twelvedata-exporter
-
-USAGE:
-   twelvedata-exporter COMMAND [options...]
-
-VERSION:
-   1.0.1
-
-COMMANDS:
-   help, h  Shows a list of commands or help for one command
-
-GLOBAL OPTIONS:
-   --web.listen-address value, -I value     Set IP address (default: "0.0.0.0")
-   --web.listen-port value, -P value        Set port number (default: 10016)
-   --web.scrape-path value, -p value        Set the path to expose metrics (default: "/price")
-   --twelvedata.api-key value, -a value     Set key to use twelvedata API [$TWELVEDATA_API_KEY]
-   --help, -h                               show help
-   --version, -v                            print the version
-```
+`twelvedata-exporter --help` prints every flag, and [`docs/help.md`](docs/help.md) carries the same list.
 
 ## Configuration
 
-This exporter supports following environment variables:
+The API key is the one required setting. `TWELVEDATA_API_KEY` and `--twelvedata.api-key` carry the same value, but the flag reaches the process table where every account on the host reads it, so prefer the environment variable. The exporter exits at start-up when neither is set.
 
-| Environment Variable | Description                          |
-| :------------------- | ------------------------------------ |
-| `TWELVEDATA_API_KEY` | The API Key to be used for requests. |
+## Endpoints
+
+The exporter serves two endpoints:
+
+- `/` — landing page, which prints the query format when reached at <http://localhost:10016/>
+- `/price` — metrics endpoint, configurable via `--web.scrape-path`
+
+> [!IMPORTANT]
+> The `symbols` parameter takes a comma-separated list and may repeat, and every occurrence is concatenated into one list. A request carrying none returns 200 with an empty body, so Prometheus counts that scrape as successful while every series is absent — alert on the absence of `twelvedata_price`, not on `up`.
 
 ## Metrics
 
-This exporter returns following metrics:
+Every quote series is a gauge, and one scrape publishes all five for each symbol it resolved:
 
-| Metric Name                       | Description                              | Type  | Example Value   |
-| --------------------------------- | ---------------------------------------- | ----- | --------------- |
-| `twelvedata_change_percent`       | Changed percent since last close price.  | Gauge | `1.00975`       |
-| `twelvedata_change_price`         | Changed price since last close price.    | Gauge | `1.72`          |
-| `twelvedata_price`                | Real-time or the latest available price. | Gauge | `172.06`        |
-| `twelvedata_previous_close_price` | Closing price of the previous day.       | Gauge | `170.34`        |
-| `twelvedata_volume`               | Trading volume during the bar.           | Gauge | `1.5206856e+07` |
+| Metric                            | Type  | Description                                 |
+| :-------------------------------- | :---- | :------------------------------------------ |
+| `twelvedata_price`                | Gauge | Real-time or the latest available price     |
+| `twelvedata_previous_close_price` | Gauge | Closing price of the previous day           |
+| `twelvedata_change_price`         | Gauge | Change since the previous close             |
+| `twelvedata_change_percent`       | Gauge | Change since the previous close, in percent |
+| `twelvedata_volume`               | Gauge | Trading volume during the bar               |
 
-<details>
-<summary>Click to show full metrics</summary>
+The same four labels are attached to all five, and only `symbol` is chosen by the operator:
 
-```plain
-# HELP twelvedata_change_percent Changed percent since last close price.
-# TYPE twelvedata_change_percent gauge
-twelvedata_change_percent{currency="USD",exchange="NASDAQ",name="Alphabet Inc",symbol="GOOGL"} 1.00975
-# HELP twelvedata_change_price Changed price since last close price.
-# TYPE twelvedata_change_price gauge
-twelvedata_change_price{currency="USD",exchange="NASDAQ",name="Alphabet Inc",symbol="GOOGL"} 1.72
-# HELP twelvedata_failed_queries_total Count of failed queries
-# TYPE twelvedata_failed_queries_total counter
-twelvedata_failed_queries_total 0
-# HELP twelvedata_previous_close_price Closing price of the previous day.
-# TYPE twelvedata_previous_close_price gauge
-twelvedata_previous_close_price{currency="USD",exchange="NASDAQ",name="Alphabet Inc",symbol="GOOGL"} 170.34
-# HELP twelvedata_price Real-time or the latest available price.
-# TYPE twelvedata_price gauge
-twelvedata_price{currency="USD",exchange="NASDAQ",name="Alphabet Inc",symbol="GOOGL"} 172.06
-# HELP twelvedata_queries_total Count of completed queries
-# TYPE twelvedata_queries_total counter
-twelvedata_queries_total 1
-# HELP twelvedata_query_duration_seconds Duration of queries to the upstream API
-# TYPE twelvedata_query_duration_seconds summary
-twelvedata_query_duration_seconds_sum 0
-twelvedata_query_duration_seconds_count 0
-# HELP twelvedata_volume Trading volume during the bar.
-# TYPE twelvedata_volume gauge
-twelvedata_volume{currency="USD",exchange="NASDAQ",name="Alphabet Inc",symbol="GOOGL"} 1.5206856e+07
-```
+| Label      | Holds                                       |
+| :--------- | :------------------------------------------ |
+| `symbol`   | The symbol as the scrape URL spelled it     |
+| `name`     | The instrument name the quote carried       |
+| `exchange` | The exchange the quote was taken from       |
+| `currency` | The currency the row's prices are quoted in |
 
-</details>
+> [!IMPORTANT]
+> `twelvedata_price` is computed as `previous_close + change` rather than read from the quote's `close` field, so it agrees with the two series beside it at every instant. A field that fails to parse becomes `0`, which no label distinguishes from a genuine zero. A symbol whose request fails is skipped, so its series are absent rather than zero.
 
-## Usage
+### Exporter Health Metrics
 
-### Exporter
+These series describe the exporter itself rather than the quotes it fetches. They carry no labels, and [`docs/health.md`](docs/health.md) carries the whole set with the reading each one needs.
 
-To refer to the usage, please access <http://localhost:10016/> after starting the exporter.
+| Metric                              | Type    | Description                             |
+| :---------------------------------- | :------ | :-------------------------------------- |
+| `twelvedata_queries_total`          | Counter | Count of completed queries              |
+| `twelvedata_failed_queries_total`   | Counter | Count of failed queries                 |
+| `twelvedata_query_duration_seconds` | Summary | Duration of queries to the upstream API |
+
+> [!IMPORTANT]
+> Read none of the three as a health signal without [`docs/health.md`](docs/health.md). `twelvedata_failed_queries_total` has no increment path and stays `0`, and `twelvedata_query_duration_seconds` observes an instant against itself, so its `_sum` stays `0` too.
+
+## Use Cases
+
+### Basic Usage
+
+No symbol is named until a scrape arrives, so the exporter starts with the key alone.
 
 ```bash
-$ TWELVEDATA_API_KEY="foobarbaz"
-$ docker run -p 10016:10016 -e TWELVEDATA_API_KEY ghcr.io/umatare5/twelvedata-exporter
-INFO[0000] Listening on port 0.0.0.0:10016
+$ TWELVEDATA_API_KEY="foobarbaz" ./twelvedata-exporter
+INFO[0000] Starting the Twelvedata exporter on 0.0.0.0:10016
 ```
 
-or using a binary:
+Open <http://localhost:10016/> for the query format and the example URLs it prints.
 
-```bash
-$ TWELVEDATA_API_KEY="foobarbaz"
-$ ./twelvedata-exporter
-INFO[0000] Listening on port 0.0.0.0:10016
-```
+### Prometheus Configuration
 
-### Prometheus
+#### Job Configuration Example
 
-Please refer to [prometheus.sample.yml#L27-L42](./prometheus.sample.yml#L27-L42).
+Add the job from [`prometheus.sample.yml`](./prometheus.sample.yml) to your Prometheus configuration. The exporter reads its symbols from `params.symbols`, so that list and the job's `scrape_interval` set the credit spend.
 
-- To know how to write technical indicators as PromQL, please refer to [prometheus.rules.sample.yml](./prometheus.rules.sample.yml).
+#### Recording Rules Configuration Example
 
-## Development
+Add the rules from [`prometheus.rules.sample.yml`](./prometheus.rules.sample.yml) to your configuration. They derive the indicators once per evaluation rather than in every dashboard query.
 
-### Build
+## Contributing
 
-The repository includes a ready to use `Dockerfile`. Run the following command to build a new image:
+See [`CONTRIBUTING.md`](CONTRIBUTING.md) for the `make` targets, the Docker build and the release process.
 
-```bash
-make image
-```
+## Acknowledgement
 
-The new image is named as `$USER/twelvedata-exporter` and exports `10016/tcp` to your host.
-
-### Release
-
-To release a new version, add a `## [vX.Y.Z]` section to [CHANGELOG.md](CHANGELOG.md) with that version's release link, update the `VERSION` file to match, and merge both into `main`.
-
-A push to `main` touching `VERSION` runs the [release workflow](https://github.com/umatare5/twelvedata-exporter/actions/workflows/go-release.yml), which tags the commit and publishes the release in the same run.
-
-## Contribution
-
-1. Fork (<https://github.com/umatare5/twelvedata-exporter/fork>)
-2. Create a feature branch
-3. Commit your changes
-4. Rebase your local changes against the master branch
-5. Create a new Pull Request
-
-## Acknowledgements
-
-I used to use [Marco Paganini](https://github.com/marcopaganini)'s [quotes-exporter](https://github.com/marcopaganini/quotes-exporter) before. However, due to changes in the external endpoint, that exporter was broken and archived.
-Now, I built this exporter taking Marco's exporter as a reference. My thanks to Marco the predecessor, and [Tristan Colgate-McFarlane](https://github.com/tcolgate) the creator of [yquotes-exporter](https://github.com/tcolgate/yquotes_exporter) who preceded Marco.
+I ran [Marco Paganini](https://github.com/marcopaganini)'s [quotes-exporter](https://github.com/marcopaganini/quotes-exporter) until an upstream endpoint change broke it and it was archived. This one builds on his, with thanks to him and to [Tristan Colgate-McFarlane](https://github.com/tcolgate), whose [yquotes-exporter](https://github.com/tcolgate/yquotes_exporter) came first.
 
 ## Licence
 
-[MIT](LICENSE)
+MIT. The binary statically links Apache-2.0, MIT and BSD 3-Clause dependencies, whose notices are reproduced in [`NOTICE`](NOTICE) and shipped alongside [`LICENSE`](LICENSE) in every release archive and container image.

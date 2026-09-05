@@ -5,6 +5,7 @@ Notable changes to the metric surface, one section per release, listing the pull
 ## [Unreleased]
 
 - [#61](https://github.com/umatare5/twelvedata-exporter/pull/61) — Deprecate the per-architecture image tags
+- [#64](https://github.com/umatare5/twelvedata-exporter/pull/64) — Rework the document set to the house standard
 
 ## [v1.2.1]
 

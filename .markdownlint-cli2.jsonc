@@ -29,7 +29,7 @@
             "## Repository Structure", "*",
             "## Setup and Commands", "*",
             "## Code Style", "*",
-            "## Testing Instructions", "*",
+            "## Testing", "*",
             "## Commits and PRs", "*",
             "## Domain Knowledge", "*"
           ]
@@ -40,13 +40,29 @@
       "filter": ["CHANGELOG.md"],
       "combine": "merge",
       "config": {
-        // Release headings accrue and this repository opens each one directly as
-        // `## [vX.Y.Z]`, so only the title is pinned
+        // Release headings accrue, so only the standing section is pinned
         "MD043": {
           "match_case": true,
           "headings": [
             "# Changelog",
+            "## [Unreleased]",
             "*"
+          ]
+        }
+      }
+    },
+    {
+      "filter": ["CONTRIBUTING.md"],
+      "combine": "merge",
+      "config": {
+        "MD043": {
+          "match_case": true,
+          "headings": [
+            "# Contributing",
+            "## Commands", "*",
+            "## Build", "*",
+            "## Release", "*",
+            "## Pull requests"
           ]
         }
       }
@@ -55,8 +71,7 @@
       "filter": ["README.md"],
       "combine": "merge",
       "config": {
-        // The logo, badges and title block are HTML; the heading they carry is an <h1>,
-        // and the full metric exposition folds into a <details> block
+        // The logo, badges and title block are HTML; the heading they carry is an <h1>
         "MD033": {
           "allowed_elements": ["a", "br", "details", "div", "h1", "img", "p", "picture", "source", "summary"]
         },
@@ -68,12 +83,55 @@
             "## Quick Start", "*",
             "## Syntax", "*",
             "## Configuration", "*",
+            "## Endpoints", "*",
             "## Metrics", "*",
-            "## Usage", "*",
-            "## Development", "*",
-            "## Contribution", "*",
-            "## Acknowledgements", "*",
+            "## Use Cases", "*",
+            "## Contributing", "*",
+            "## Acknowledgement", "*",
             "## Licence"
+          ]
+        }
+      }
+    },
+    {
+      "filter": ["docs/health.md"],
+      "combine": "merge",
+      "config": {
+        "MD043": {
+          "match_case": true,
+          "headings": [
+            "# Exporter health",
+            "## Metrics", "*",
+            "## Specifications", "*"
+          ]
+        }
+      }
+    },
+    {
+      "filter": ["docs/help.md"],
+      "combine": "merge",
+      "config": {
+        "MD043": {
+          "match_case": true,
+          "headings": [
+            "# Help",
+            "## Notes", "*"
+          ]
+        }
+      }
+    },
+    {
+      "filter": ["SECURITY.md"],
+      "combine": "merge",
+      "config": {
+        "MD043": {
+          "match_case": true,
+          "headings": [
+            "# Security Policy",
+            "## Supported Versions", "*",
+            "## Reporting a Vulnerability", "*",
+            "## What to Include", "*",
+            "## Scope"
           ]
         }
       }
