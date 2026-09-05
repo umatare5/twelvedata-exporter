@@ -37,22 +37,24 @@ This exporter fetches quotes from [Twelve Data](https://twelvedata.com/) and ser
 
 ## Quick Start
 
-### 1. Run the exporter with Docker
+### 1. Set the API token
+
+```bash
+export TWELVEDATA_API_KEY="your-twelvedata-api-token"
+```
+
+### 2. Run the exporter with Docker
 
 ```bash
 docker run -p 10016:10016 -e TWELVEDATA_API_KEY ghcr.io/umatare5/twelvedata-exporter
 ```
-
-The image declares `10016/tcp` without publishing it, so `-p` is what makes the exporter reachable, and `-e` forwards the key from the shell rather than baking it into the image.
-
-The published tags are `latest`, `vX`, `vX.Y` and `vX.Y.Z`. Each one is a multi-platform image covering `linux/amd64` and `linux/arm64`, so Docker selects the architecture of the host.
 
 > [!TIP]
 > If you prefer using binaries, download them from the [Release](https://github.com/umatare5/twelvedata-exporter/releases).
 >
 > **Supported Platform:** `linux_amd64`, `linux_arm64`, `darwin_amd64`, `darwin_arm64` and `windows_amd64`
 
-### 2. Scrape it
+### 3. Scrape it
 
 See [Prometheus Configuration](#prometheus-configuration) for the job and the recording rules.
 
