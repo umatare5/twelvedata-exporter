@@ -1,16 +1,16 @@
 # Repository Instructions
 
 > [!IMPORTANT]
-> Read [README.md](README.md) for product overview, metric surface, flags, and operator usage.
+> Read [`README.md`](README.md) for product overview, metric surface, flags, and operator usage.
 
 ## Tech Stack
 
-- Go 1.27+ (see [go.mod](go.mod))
+- Go 1.27+ (see [`go.mod`](go.mod))
 - [`prometheus/client_golang`](https://github.com/prometheus/client_golang) — metric registration and exposition
 - [`urfave/cli/v3`](https://github.com/urfave/cli) — CLI flags and application lifecycle
 - [`sirupsen/logrus`](https://github.com/sirupsen/logrus) — structured logging
 - [`jinzhu/configor`](https://github.com/jinzhu/configor) — configuration loading
-- [`goreleaser`](https://goreleaser.com/) v2 — cross-platform release builds (see [.goreleaser.yml](.goreleaser.yml))
+- [`goreleaser`](https://goreleaser.com/) v2 — cross-platform release builds (see [`.goreleaser.yml`](.goreleaser.yml))
 
 ## Repository Structure
 
@@ -19,8 +19,9 @@
 - `config/` — Flag and environment variable parsing, defaults, and validation
 - `internal/` — Collector, upstream Twelve Data client, and HTTP server
 - `log/` — logrus setup and logging helpers
+- `scripts/` — Hook helpers invoked by pre-commit, not by the build
 - `docs/` — Project assets (logos)
-- `prometheus.sample.yml` / `prometheus.rules.sample.yml` — Prometheus scrape and rule examples
+- `prometheus.sample.yml` / `prometheus.rules.sample.yml` — Prometheus scrape and rule examples, both checked by promtool in CI
 
 ## Setup and Commands
 
@@ -28,9 +29,9 @@ Install required tools (one-time):
 
 - `go install gotest.tools/gotestsum@latest`
 - `golangci-lint` — See <https://golangci-lint.run/docs/welcome/install/local/>
-- `make pre-commit-install` wires `no-commit-to-main`, `golangci-lint`, `actionlint`, `gitleaks` and `markdownlint-cli2` (see [.pre-commit-config.yaml](.pre-commit-config.yaml))
+- `make pre-commit-install` wires `no-commit-to-main`, `golangci-lint`, `actionlint`, `gitleaks` and `markdownlint-cli2` (see [`.pre-commit-config.yaml`](.pre-commit-config.yaml))
 
-Make targets ([Makefile](Makefile)):
+Make targets ([`Makefile`](Makefile)):
 
 - `make build` — Build the binary into `tmp/twelvedata-exporter`
 - `make lint` — `golangci-lint run` + `go mod tidy`
@@ -42,7 +43,8 @@ Make targets ([Makefile](Makefile)):
 
 ## Code Style
 
-- `golangci-lint` v2 with the `gci`, `gofumpt`, `goimports`, and `golines` formatters is the single source of truth (see [.golangci.yml](.golangci.yml)).
+- `golangci-lint` v2 with the `gci`, `gofumpt`, `goimports`, and `golines` formatters is the single source of truth (see [`.golangci.yml`](.golangci.yml)).
+- Markdown follows the heading contracts pinned by `MD043` in [`.markdownlint-cli2.jsonc`](.markdownlint-cli2.jsonc), so renaming a section is a config change too.
 - Keep metric names, help strings, types, and labels stable unless a SemVer-signaled breaking change is intentional.
 - Comments record only what the code cannot say, and never address the reader.
 
@@ -55,7 +57,8 @@ Make targets ([Makefile](Makefile)):
 
 - Use [Conventional Commits](https://www.conventionalcommits.org/) (`feat:`, `fix:`, `chore(deps):`, etc.).
 - Sign off commits with `Signed-off-by:` (DCO).
-- Open PRs against `main`. CI runs lint, tests, and CodeQL.
+- Open PRs against `main`. CI runs lint, tests, CodeQL, govulncheck, promtool, markdownlint and lychee.
+- Record any change to the metric surface under `## [Unreleased]` in [`CHANGELOG.md`](CHANGELOG.md), which is what the release notes are built from.
 - Call out any metrics, flags, or default scrape-path changes explicitly because they affect Prometheus configs and alerts.
 
 ## Domain Knowledge
