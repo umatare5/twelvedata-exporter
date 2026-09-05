@@ -4,7 +4,6 @@ package config
 import (
 	"errors"
 
-	"github.com/jinzhu/configor"
 	cli "github.com/urfave/cli/v3"
 
 	"github.com/umatare5/twelvedata-exporter/log"
@@ -33,11 +32,6 @@ func NewConfig(cmd *cli.Command) Config {
 		WebListenPort:    cmd.Int(WebListenPortFlagName),
 		WebScrapePath:    cmd.String(WebScrapePathFlagName),
 		TwelvedataAPIKey: cmd.String(TwelvedataAPIKeyFlagName),
-	}
-
-	err := configor.New(&configor.Config{}).Load(&config)
-	if err != nil {
-		log.Fatal(err)
 	}
 
 	if err := isValidWebListenAddressFlag(config.WebListenAddress); err != nil {
