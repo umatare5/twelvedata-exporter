@@ -21,7 +21,7 @@
 - `log/` — logrus setup and logging helpers
 - `scripts/` — Hook helpers invoked by pre-commit, not by the build
 - `docs/` — Project assets (logos)
-- `prometheus.sample.yml` / `prometheus.rules.sample.yml` — Prometheus scrape and rule examples, both checked by promtool in CI
+- `prometheus.sample.yml` / `prometheus.rules.sample.yml` — Prometheus scrape and rule examples
 
 ## Setup and Commands
 
@@ -44,7 +44,6 @@ Make targets ([`Makefile`](Makefile)):
 ## Code Style
 
 - `golangci-lint` v2 with the `gci`, `gofumpt`, `goimports`, and `golines` formatters is the single source of truth (see [`.golangci.yml`](.golangci.yml)).
-- Markdown follows the heading contracts pinned by `MD043` in [`.markdownlint-cli2.jsonc`](.markdownlint-cli2.jsonc), so renaming a section is a config change too.
 - Keep metric names, help strings, types, and labels stable unless a SemVer-signaled breaking change is intentional.
 - Comments record only what the code cannot say, and never address the reader.
 
@@ -58,7 +57,7 @@ Make targets ([`Makefile`](Makefile)):
 - Use [Conventional Commits](https://www.conventionalcommits.org/) (`feat:`, `fix:`, `chore(deps):`, etc.).
 - Sign off commits with `Signed-off-by:` (DCO).
 - Open PRs against `main`. CI runs lint, tests, CodeQL, govulncheck, promtool, markdownlint and lychee.
-- Record any change to the metric surface under `## [Unreleased]` in [`CHANGELOG.md`](CHANGELOG.md), which is what the release notes are built from.
+- Record any change to the metric surface under `## [Unreleased]` in [`CHANGELOG.md`](CHANGELOG.md).
 - Call out any metrics, flags, or default scrape-path changes explicitly because they affect Prometheus configs and alerts.
 
 ## Domain Knowledge
