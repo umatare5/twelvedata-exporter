@@ -5,6 +5,7 @@ Notable changes to the metric surface, one section per release, listing the pull
 ## [Unreleased]
 
 - [#61](https://github.com/umatare5/twelvedata-exporter/pull/61) — Deprecate the per-architecture image tags
+- [#63](https://github.com/umatare5/twelvedata-exporter/pull/63) — Validate the Prometheus samples with promtool
 
 ## [v1.2.1]
 
