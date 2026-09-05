@@ -47,7 +47,7 @@ Make targets ([`Makefile`](Makefile)):
 - Keep metric names, help strings, types, and labels stable unless a SemVer-signaled breaking change is intentional.
 - Comments record only what the code cannot say, and never address the reader.
 
-## Testing Instructions
+## Testing
 
 - Run `make build` and `make test-unit` before committing.
 - Place tests next to code under test (`*_test.go`). The repository has no unit tests yet.
