@@ -64,11 +64,23 @@ Make targets ([`Makefile`](Makefile)):
 
 These are the upstream behaviours every change to the client or the collector has to hold.
 
+### The API
+
 - **Credits are spent per symbol, against a per-minute allowance.** `/quote` costs one credit per symbol, so folding symbols into one request would not lower the spend, and `/api_usage` reports `plan_limit` as requests per minute.
 - **No response header reports the remaining budget.** A reply carries no rate-limit, credit or `Retry-After` header, so the allowance left is visible only through `/api_usage`, which costs a credit of its own.
 - **An error arrives as a `code`/`message`/`status` object that decodes into the quote struct without failing.** The HTTP status mirrors `code` — a rejected key answers `401` and a missing `symbol` answers `404` — so the status is what separates an error from a quote. A body-only check sees empty strings instead.
 - **Every price field is a JSON string whose precision `dp` sets, five places by default.** Parse rather than assume, and expect absence. `volume`, `average_volume`, `mic_code` and `currency` are documented as unavailable for some instrument types. The `rolling_*` and `extended_*` fields appear only when the plan and the request parameters ask for them.
-- **`/quote` describes a bar, not a tick.** Its default `interval` is `1day`, and `change` and `percent_change` are taken against `previous_close`. The same bar repeats while `is_market_open` is false, so an overnight scrape holds a value rather than going absent.
-- **The strings the labels carry are the API's resolution, not the operator's input.** A bare `symbol` is ambiguous across venues, which `exchange`, `mic_code` and `country` narrow, and the reply echoes what it chose. Those strings drift, and a changed value renames every series carrying it. The documented `AAPL` example gives `mic_code` `XNAS` and `name` `Apple Inc`, where a live reply gives `XNGS` and `Apple Inc.`
 - **The key belongs in the `Authorization: apikey <key>` header the documentation recommends.** The `?apikey=` form the client sends today puts the credential in every proxy and access log along the path. Never log it, and never vendor a response that carries account-level detail.
 - **`apikey=demo` answers for a small set of symbols alone.** Everything else, a comma-separated list included, comes back `401`, so a demo request proves reachability rather than behaviour.
+
+### The market
+
+- **A bar is a running aggregate, not a settled value.** `/quote` defaults to `interval=1day`, so `close` moves with every scrape of a live session and `volume` accumulates from the open and resets at the next one. A gauge is the only honest type for either.
+- **`previous_close` means the previous bar, and `interval` decides what a bar is.** At `1day` it is the prior session's close, which is what the metric help claims; at `1min` a live reply gives `previous_close` `319.82999` against `close` `319.98999`. Changing `interval` silently changes what `twelvedata_change_price` measures.
+- **Outside the session the same bar repeats.** `is_market_open` goes false while `datetime` stays on the last session, and Prometheus stamps each sample with scrape time, so a stale close is indistinguishable from a live one. Nothing the exporter publishes carries the market state that would separate them.
+- **A corporate action moves the price without a trade.** `/time_series` takes `adjust` and defaults it to `splits`; `/quote` takes no such parameter, so its treatment of a split is undocumented. An unadjusted 4-for-1 reads as a −75% move, which is why no alert should fire on the magnitude of `twelvedata_change_percent` alone.
+- **The venue is chosen for you, and it fixes the currency.** A bare `symbol` resolves to one listing, which `exchange`, `mic_code` and `country` narrow. Cross-listings quote in their own currency, so ranking `twelvedata_price` across symbols only means something within one.
+- **The strings that resolution returns are label values, and they drift.** The documented `AAPL` example gives `mic_code` `XNAS` and `name` `Apple Inc`, where a live reply gives `XNGS` and `Apple Inc.` — a changed value renames every series carrying it.
+- **Instruments outside equities drop the fields the labels need.** A live `EUR/USD` or `BTC/USD` reply carries no `currency`, `mic_code`, `volume` or `average_volume`, so the `currency` label goes empty and the volume gauge reads a parsed `0`. Both markets also keep `is_market_open` true around the clock.
+- **`dp` rounds to decimal places, not to significant figures.** Five is generous for a US equity and coarse for an FX pair, where `EUR/USD` at `dp=2` returns `change` `-0.00`. Asking for more surfaces the float32 the API stores: `AAPL` at `dp=11` returns `319.97000122070`.
+- **An indicator computed in Prometheus is not the indicator a chart shows.** The RSI in [`prometheus.rules.sample.yml`](prometheus.rules.sample.yml) runs over scrape samples, which repeat one daily bar for the length of a session, so its period is wall-clock rather than bars. It demonstrates the mechanism; it is not a trading signal.
