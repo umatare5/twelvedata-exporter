@@ -69,11 +69,9 @@ See [Prometheus Configuration](#prometheus-configuration) for the job and the re
 | `--web.listen-port`    | `10016`   | Port the exporter listens on   |
 | `--web.scrape-path`    | `/price`  | Path the metrics are served on |
 
-## Configuration
+## Environment Variables
 
-This exporter reads one environment variable:
-
-| Environment Variable | Description                    |
+| Variable             | Description                    |
 | :------------------- | :----------------------------- |
 | `TWELVEDATA_API_KEY` | Twelve Data API key (required) |
 

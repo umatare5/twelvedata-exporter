@@ -82,7 +82,7 @@
             "## Overview", "*",
             "## Quick Start", "*",
             "## Flags", "*",
-            "## Configuration", "*",
+            "## Environment Variables", "*",
             "## Endpoints", "*",
             "## Metrics", "*",
             "## Use Cases", "*",
