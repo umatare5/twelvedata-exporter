@@ -49,6 +49,9 @@ export TWELVEDATA_API_KEY="your-twelvedata-api-token"
 docker run -p 10016:10016 -e TWELVEDATA_API_KEY ghcr.io/umatare5/twelvedata-exporter
 ```
 
+> [!WARNING]
+> The per-architecture tags — `latest-amd64`, `latest-arm64` and their `vX-`, `vX.Y-` and `vX.Y.Z-` counterparts — are **deprecated and no longer published**. They stopped receiving updates after v1.1.0, so `latest-amd64` and `v1-amd64` still resolve to v1.1.0 and never move again. Pull `latest`, `vX`, `vX.Y` or `vX.Y.Z` instead, each of which serves both `linux/amd64` and `linux/arm64`.
+
 > [!TIP]
 > If you prefer using binaries, download them from the [Release](https://github.com/umatare5/twelvedata-exporter/releases).
 >
