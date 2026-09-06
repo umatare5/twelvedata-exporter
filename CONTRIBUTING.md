@@ -1,55 +1,41 @@
 # Contributing
 
-Thank you for considering a contribution.
+The [shared conventions](https://github.com/umatare5/.github/blob/main/CONTRIBUTING.md) carry the tool setup, the `make` targets, the hook order, the release procedure and the pull request rules. This page carries what is specific to this exporter.
 
-## Commands
+## Development
 
-The following `make` commands are available for development and testing:
+CI runs Format and Lint, Test and Build, Coverage, Prometheus Rules and CodeQL on every pull request, and govulncheck, actionlint, markdownlint and Link Check when the paths each one watches change.
 
-| Command                     | Description                                     |
-| :-------------------------- | :---------------------------------------------- |
-| `make help`                 | Display available targets and requirements      |
-| `make build`                | Build the binary to `./tmp/twelvedata-exporter` |
-| `make lint`                 | Run golangci-lint and tidy go.mod               |
-| `make test-unit`            | Run unit tests with coverage using gotestsum    |
-| `make test-unit-coverage`   | Generate HTML coverage report                   |
-| `make clean`                | Remove build artifacts and backup files         |
-| `make image`                | Build Docker image                              |
-| `make pre-commit-install`   | Install the pre-commit hooks                    |
-| `make pre-commit-test`      | Run every hook across the tree                  |
-| `make pre-commit-uninstall` | Remove the pre-commit hooks                     |
+- **The coverage threshold is zero** — no package carries a test yet, so the job publishes a figure rather than gating on one, and it tightens with the first test that lands.
+- **The image declares port 10016** — `EXPOSE` publishes nothing, so `docker run -p` does.
 
-Markdown style is enforced by the `markdownlint-cli2` hook that `make pre-commit-install` wires in, and again in CI. Links are checked in CI only, because that run reaches third-party hosts, so `lychee .` is what reproduces a link failure locally.
-
-The Prometheus samples are checked in CI too. `promtool check rules` and `promtool check config` run against [`prometheus.rules.sample.yml`](prometheus.rules.sample.yml) and [`prometheus.sample.yml`](prometheus.sample.yml). Both run with `--lint-fatal`, because promtool otherwise prints a lint finding and still exits 0.
-
-## Build
-
-The repository includes a ready to use `Dockerfile`. To build a new Docker image:
+Two commands reproduce the `Prometheus Rules` job locally.
 
 ```bash
-make image
+promtool check rules --lint all --lint-fatal prometheus.rules.sample.yml
+promtool check config --lint all --lint-fatal prometheus.sample.yml
 ```
 
-This cross-compiles a Linux binary into `./tmp/image/linux/<arch>`, then builds from `./tmp/image` rather than the repository root. The `Dockerfile` expects the GoReleaser context layout, `linux/<arch>/twelvedata-exporter` beside `LICENSE` and `NOTICE`, which the root does not carry.
+Both carry `--lint-fatal` because `promtool` otherwise prints a lint finding and still exits 0, so the job would pass over a rule it had just faulted.
 
-The image is tagged `$USER/twelvedata-exporter` and declares port 10016 without publishing it, so publish it with `docker run -p`. Released images are pushed to `ghcr.io/umatare5/twelvedata-exporter` by GoReleaser instead.
+## Testing
 
-## Release
+- **The tree carries no test** — `make test-unit` finds no `*_test.go` anywhere, so the first one added sets its package's conventions rather than following them.
+- **The upstream is reachable only from inside** — `baseURL` is unexported, so a test in `internal` points it at an `httptest` server while one outside the package cannot.
 
-To release a new version, follow these steps:
+## Code Style
 
-1. Rename the `## [Unreleased]` section in `CHANGELOG.md` to `## [vX.Y.Z]`, and add that version's release link at the foot of the file.
-2. Update the version in the `VERSION` file to match.
-3. Submit a pull request with both files.
+The metric names, HELP strings, types and labels are the contract a Prometheus configuration is written against, so changing one breaks the alerts and dashboards built on it. A change to any of them is SemVer-signalled and ships with its own CHANGELOG entry.
 
-Merging that pull request starts the release. A push to `main` touching `VERSION` runs the [release workflow](https://github.com/umatare5/twelvedata-exporter/actions/workflows/go-release.yml), which tags the commit and publishes the release in the same run.
+## Documentation
 
-## Pull requests
+Every fact has one page that owns it, and the other pages link to it rather than restating it.
 
-1. [Fork](https://github.com/umatare5/twelvedata-exporter/fork) the repository
-2. Create a feature branch
-3. Commit your changes
-4. Record any change to the metric surface under the `## [Unreleased]` section in `CHANGELOG.md`, adding the section if it is not there yet
-5. Rebase your local changes against the `main` branch
-6. Create a new Pull Request
+| Page             | Owns                                   |
+| :--------------- | :------------------------------------- |
+| `README.md`      | What it is, how to run and scrape it   |
+| `docs/health.md` | The exporter's own health series       |
+| `docs/help.md`   | The verbatim `--help` transcript       |
+| `AGENTS.md`      | The upstream behaviours a change holds |
+
+A sentence in `AGENTS.md` about what the API returns is written only after a live reply showed it, because the documentation and the live service disagree. The documented `AAPL` example gives `mic_code` `XNAS` where a live reply gives `XNGS`, and a changed value renames every series that carries it.
