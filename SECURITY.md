@@ -1,45 +1,54 @@
 # Security Policy
 
-## Supported Versions
-
-No older tag gets a patch branch, so only the most recent tagged release carries fixes — reproduce a finding against it before reporting.
-
-## Reporting a Vulnerability
-
-Report privately through [GitHub Security Advisories](https://github.com/umatare5/twelvedata-exporter/security/advisories/new). **Please do not report a vulnerability through a public GitHub issue or a pull request.**
-
-One maintainer works on this in their own time, so the response is best effort with no promised window. The advisory goes out once the fix ships, because publishing it earlier discloses the flaw while every deployment is still exposed. It carries a CVE request and credits the reporter unless they ask otherwise.
+The [shared security policy](https://github.com/umatare5/.github/blob/main/SECURITY.md) covers what every exporter here shares. This page carries the rest.
 
 ## What to Include
 
-**Redact these first.** Each one names an account or a position rather than a defect, so none of them belongs in a report.
+Redact these before reporting, in addition to the credentials the shared policy names.
 
-- The Twelve Data API key, which a log line, a process listing or a scrape URL can carry
-- The account the key resolves to, and any credit or billing figure tied to that account
-- A private scrape URL, whose `symbols` list discloses the instruments being watched
+- The Twelve Data API key, from a flag, an environment variable, a process listing or a log line
+- The account it resolves to, and any credit balance or billing figure tied to that account
+- The `symbols` list of a private scrape URL, which names the instruments being watched
 
-Then include the following:
+A scrape URL carries `symbols` alone, so reproduction needs it together with the flags in force.
 
-- **Affected versions** (required): The `twelvedata-exporter` release, and the image tag if you ran the container
-- **Reproduction steps** (required): The flags and environment variables, and the scrape URL with the key removed
-- **Output** (required): The exposition or the log lines, with every value above removed
-- **Impact assessment** (required): The exploit scenario, and what it reaches
-- **Suggested fix** (optional): Proposed remediation, if any
-- **Disclosure status** (required): Whether it is shared elsewhere, and your plan for sharing it
+## Exposure
 
-## Scope
+This exporter holds one credential, and `--twelvedata.api-key` and `TWELVEDATA_API_KEY` are its only sources, so nothing arriving in a scrape can set it. The scrape path answers a `symbols` query and reads no other parameter.
 
-In scope:
+- **The variable is safer** — the flag reaches a process table every account on the host reads.
+- **The environment is narrower** — `/proc/<pid>/environ` opens to the owner and root alone.
+- **The log records the URI** — every request to the scrape path is logged whole by the exporter.
+- **The symbol list lands there** — so does whatever else the query carried.
+- **The labels name the instrument** — `symbol`, `name`, `exchange` and `currency` carry it.
+- **The endpoint is unauthenticated** — one scrape discloses the whole watch list.
+- **The landing page is fixed** — `/` prints example symbols compiled into the binary.
+- **No operator choice reaches it** — the page names the listen address and the scrape path alone.
 
-- The API key reaching a log line, the landing page, or the body of a scrape response
-- The API key reaching an upstream request other than as the documented `apikey` query parameter
-- A `symbols` value escaping the URL it arrived in, into a label name or a metric name
-- A scrape reaching an endpoint other than `/quote`, or a host other than `api.twelvedata.com`
-- The published container image
+> [!IMPORTANT]
+> The key reaching a log line, the landing page or a scrape response body is a vulnerability, as is a `symbols` value escaping the URL it arrived in into a metric name or a label name.
+>
+> So is a request reaching a host other than `api.twelvedata.com`, or an endpoint other than `/quote`, since both are compiled in and no flag or query moves them.
 
-Out of scope:
+## Egress Paths
 
-- The unauthenticated metrics endpoint, because the operator controls its exposure with a network path
-- A dependency advisory with no path reachable from `./cmd` — show the path, or a `govulncheck` finding
-- A defect in the Twelve Data API itself, which belongs to its operator rather than to this client
-- Credit exhaustion, since the symbol count and the scrape interval that cause it are the operator's own
+Each scrape reaches `https://api.twelvedata.com/quote` once per symbol under a ten second timeout, so a stalled upstream ends the request rather than holding the scrape open.
+
+### Credential
+
+- **The key travels in the query string** — the client appends `?apikey=` to every request.
+- **No header carries it** — the credential sits in the URL rather than in one.
+- **The documented form is a header** — `Authorization: apikey <key>` is what Twelve Data documents.
+- **The client sends the query form** — [`AGENTS.md`](AGENTS.md) records it as a defect this repository carries.
+- **A URL outlives a header** — each proxy and gateway on the path logs the query string.
+- **Those logs are not the operator's** — a key sent that way survives in every one of them.
+
+### Cost
+
+- **A scrape spends money** — `/quote` costs one credit per symbol.
+- **The plan allowance is per minute** — the symbol count and the scrape interval set the spend.
+
+## Out of Scope
+
+- A defect in the Twelve Data service belongs to Twelve Data rather than to this client.
+- Credit or billing exhaustion, which the operator's own symbol count and scrape interval decide.

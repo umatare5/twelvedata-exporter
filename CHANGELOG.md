@@ -8,6 +8,7 @@ Notable changes to the metric surface, one section per release, listing the pull
 - [#63](https://github.com/umatare5/twelvedata-exporter/pull/63) — Validate the Prometheus samples with promtool
 - [#64](https://github.com/umatare5/twelvedata-exporter/pull/64) — Rework the document set to the house standard
 - [#69](https://github.com/umatare5/twelvedata-exporter/pull/69) — Stop an environment variable from overriding an explicit flag
+- [#70](https://github.com/umatare5/twelvedata-exporter/pull/70) — Link the shared baseline and narrow the release archive
 
 ## [v1.2.1]
 

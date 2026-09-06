@@ -39,12 +39,12 @@ builds:
 
 archives:
   - name_template: '{{ .ProjectName }}-v{{ .Version }}_{{ .Os }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}'
+    # Only what a downloaded binary needs beside it: the licence notices its
+    # statically linked dependencies require on redistribution. The exporter
+    # parses none of the files it used to ship, so every one of them is a click
+    # away on the page the archive was downloaded from. The key stays because
+    # GoReleaser's default set omits NOTICE.
     files:
-      - "README.md"
-      - "CHANGELOG.md"
-      - "docs/*.md"
-      - "prometheus.sample.yml"
-      - "prometheus.rules.sample.yml"
       - "LICENSE"
       - "NOTICE"
     format_overrides:
