@@ -31,7 +31,7 @@ The repository includes a ready to use `Dockerfile`. To build a new Docker image
 make image
 ```
 
-This cross-compiles a Linux binary into `./tmp/image/linux/<arch>`, then builds from `./tmp/image` rather than the repository root. The `Dockerfile` expects the GoReleaser context layout, `linux/<arch>/twelvedata-exporter` beside `LICENSE`, which the root does not carry.
+This cross-compiles a Linux binary into `./tmp/image/linux/<arch>`, then builds from `./tmp/image` rather than the repository root. The `Dockerfile` expects the GoReleaser context layout, `linux/<arch>/twelvedata-exporter` beside `LICENSE` and `NOTICE`, which the root does not carry.
 
 The image is tagged `$USER/twelvedata-exporter` and declares port 10016 without publishing it, so publish it with `docker run -p`. Released images are pushed to `ghcr.io/umatare5/twelvedata-exporter` by GoReleaser instead.
 

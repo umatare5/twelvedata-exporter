@@ -9,7 +9,6 @@
 - [`prometheus/client_golang`](https://github.com/prometheus/client_golang) — metric registration and exposition
 - [`urfave/cli/v3`](https://github.com/urfave/cli) — CLI flags and application lifecycle
 - [`sirupsen/logrus`](https://github.com/sirupsen/logrus) — structured logging
-- [`jinzhu/configor`](https://github.com/jinzhu/configor) — configuration loading
 - [`goreleaser`](https://goreleaser.com/) v2 — cross-platform release builds (see [`.goreleaser.yml`](.goreleaser.yml))
 
 ## Repository Structure

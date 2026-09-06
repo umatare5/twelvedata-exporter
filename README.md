@@ -49,6 +49,9 @@ export TWELVEDATA_API_KEY="your-twelvedata-api-token"
 docker run -p 10016:10016 -e TWELVEDATA_API_KEY ghcr.io/umatare5/twelvedata-exporter
 ```
 
+> [!WARNING]
+> The per-architecture tags — `latest-amd64`, `latest-arm64` and their `vX-`, `vX.Y-` and `vX.Y.Z-` counterparts — are **deprecated and no longer published**. They stopped receiving updates after v1.1.0, so `latest-amd64` and `v1-amd64` still resolve to v1.1.0 and never move again. Pull `latest`, `vX`, `vX.Y` or `vX.Y.Z` instead, each of which serves both `linux/amd64` and `linux/arm64` from v1.0.2 on.
+
 > [!TIP]
 > If you prefer using binaries, download them from the [Release](https://github.com/umatare5/twelvedata-exporter/releases).
 >
@@ -122,7 +125,7 @@ These series describe the exporter itself rather than the quotes it fetches. The
 | `twelvedata_query_duration_seconds` | Summary | Duration of queries to the upstream API |
 
 > [!IMPORTANT]
-> Read none of the three as a health signal without [`docs/health.md`](docs/health.md). `twelvedata_failed_queries_total` has no increment path and stays `0`, and `twelvedata_query_duration_seconds` observes an instant against itself, so its `_sum` stays `0` too.
+> Read none of the three as a health signal without [`docs/health.md`](docs/health.md). `twelvedata_failed_queries_total` has no increment path and stays `0`, and `twelvedata_query_duration_seconds` observes an instant against itself, so its `_sum` carries no latency either.
 
 ## Use Cases
 
