@@ -26,7 +26,7 @@ Each entry carries what the series' HELP text does not.
 
 **`twelvedata_query_duration_seconds`**
 
-- It observes `time.Since(time.Now())` rather than an elapsed interval, so `_sum` accumulates nanoseconds rather than the request duration, while `_count` follows the quotes that parsed.
+- It observes `time.Since(time.Now())` rather than an elapsed interval, so `_sum` accumulates nanosecond-scale values rather than the request duration, while `_count` follows the quotes that parsed.
 - The observation sits after the response is parsed, so a request that failed or returned a nameless quote reaches neither `_count` nor `_sum`.
 - Read `_count` as a success count and take latency from the scrape duration instead.
 
