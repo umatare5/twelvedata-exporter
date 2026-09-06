@@ -34,12 +34,17 @@ This exporter holds one credential, and `--twelvedata.api-key` and `TWELVEDATA_A
 
 Each scrape reaches `https://api.twelvedata.com/quote` once per symbol under a ten second timeout, so a stalled upstream ends the request rather than holding the scrape open.
 
+### Credential
+
 - **The key travels in the query string** — the client appends `?apikey=` to every request.
 - **No header carries it** — the credential sits in the URL rather than in one.
 - **The documented form is a header** — `Authorization: apikey <key>` is what Twelve Data documents.
 - **The client sends the query form** — [`AGENTS.md`](AGENTS.md) records it as a defect this repository carries.
 - **A URL outlives a header** — each proxy and gateway on the path logs the query string.
 - **Those logs are not the operator's** — a key sent that way survives in every one of them.
+
+### Cost
+
 - **A scrape spends money** — `/quote` costs one credit per symbol.
 - **The plan allowance is per minute** — the symbol count and the scrape interval set the spend.
 
