@@ -1,12 +1,13 @@
 # Contributing
 
-The [shared conventions](https://github.com/umatare5/.github/blob/main/CONTRIBUTING.md) carry the tool setup, the `make` targets, the hook order, the release procedure and the pull request rules. This page carries what is specific to this exporter.
+The [shared contribution guide](https://github.com/umatare5/.github/blob/main/CONTRIBUTING.md) covers what every exporter shares. This page carries the rest.
 
 ## Development
 
 CI runs Format and Lint, Test and Build, Coverage, Prometheus Rules and CodeQL on every pull request, and govulncheck, actionlint, markdownlint and Link Check when the paths each one watches change.
 
-- **The coverage threshold is zero** — no package carries a test yet, so the job publishes a figure rather than gating on one, and it tightens with the first test that lands.
+- **The coverage threshold is zero** — no package carries a test yet, so the job gates on nothing.
+- **The job publishes a figure** — it tightens with the first test that lands.
 - **The image declares port 10016** — `EXPOSE` publishes nothing, so `docker run -p` does.
 
 Two commands reproduce the `Prometheus Rules` job locally.
@@ -20,8 +21,10 @@ Both carry `--lint-fatal` because `promtool` otherwise prints a lint finding and
 
 ## Testing
 
-- **The tree carries no test** — `make test-unit` finds no `*_test.go` anywhere, so the first one added sets its package's conventions rather than following them.
-- **The upstream is reachable only from inside** — `baseURL` is unexported, so a test in `internal` points it at an `httptest` server while one outside the package cannot.
+- **The tree carries no test** — `make test-unit` finds no `*_test.go` anywhere.
+- **The first one sets conventions** — it has none to follow, so its package takes its shape.
+- **The upstream is reachable only from inside** — `baseURL` is unexported.
+- **A test in `internal` redirects it** — it points at an `httptest` server, which one outside cannot.
 
 ## Code Style
 
