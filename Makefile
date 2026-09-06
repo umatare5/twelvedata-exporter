@@ -70,7 +70,7 @@ clean:
 image:
 	mkdir -p $(IMAGE_DIR)/linux/$(GOARCH)
 	CGO_ENABLED=0 GOOS=linux go build $(BUILD_FLAGS) -o $(IMAGE_DIR)/linux/$(GOARCH)/$(BINARY_NAME) ./cmd
-	cp LICENSE $(IMAGE_DIR)/
+	cp LICENSE NOTICE $(IMAGE_DIR)/
 	docker build --platform linux/$(GOARCH) -f Dockerfile -t $(USER)/$(BINARY_NAME) $(IMAGE_DIR)
 
 # Pre-commit targets
