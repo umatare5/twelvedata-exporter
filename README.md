@@ -101,11 +101,11 @@ Every quote series is a gauge, and one scrape publishes all five for each symbol
 > See [`docs/README.md`](docs/README.md) for the absence, scrape-path and counter rules every series shares.
 
 > [!IMPORTANT]
-> A symbol whose request fails is skipped rather than published as zero, and the scrape still answers 200. Alert on `absent(twelvedata_price)` rather than on `up`, which stays 1 through every upstream failure.
+> These names, types and labels are the contract a Prometheus configuration is written against, so a change to any of them is SemVer-signalled and ships with its own [CHANGELOG](CHANGELOG.md) entry.
 
 ### Exporter Health Metrics
 
-These series describe the exporter itself rather than the quotes it fetches. They carry no labels, and [`docs/health.md`](docs/health.md) carries the whole set with the reading each one needs.
+These series describe the exporter itself rather than the quotes it fetches. They carry no labels, and [`docs/health.md`](docs/health.md) carries the reading each one needs.
 
 | Metric                              | Type    | Description                             |
 | :---------------------------------- | :------ | :-------------------------------------- |
@@ -127,7 +127,7 @@ $ TWELVEDATA_API_KEY="foobarbaz" ./twelvedata-exporter
 INFO[0000] Starting the Twelvedata exporter on 0.0.0.0:10016
 ```
 
-Open <http://localhost:10016/> for the query format and the example URLs it prints.
+Open the landing page for the query format and the example URLs it prints. They spell the address the exporter bound to, which the `0.0.0.0` default leaves unusable as shown — see [Notes](docs/help.md#notes).
 
 ### Prometheus Configuration
 
