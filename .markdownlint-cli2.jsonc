@@ -82,13 +82,39 @@
             "## Overview", "*",
             "## Quick Start", "*",
             "## Flags", "*",
-            "## Environment Variables", "*",
             "## Endpoints", "*",
             "## Metrics", "*",
-            "## Use Cases", "*",
+            "## Examples", "*",
             "## Contributing", "*",
-            "## Acknowledgement", "*",
             "## License"
+          ]
+        }
+      }
+    },
+    {
+      "filter": ["docs/README.md"],
+      "combine": "merge",
+      "config": {
+        "MD043": {
+          "match_case": true,
+          "headings": [
+            "# Documentation",
+            "## Technical Information", "*"
+          ]
+        }
+      }
+    },
+    {
+      "filter": ["docs/collectors.md"],
+      "combine": "merge",
+      "config": {
+        "MD043": {
+          "match_case": true,
+          "headings": [
+            "# Collectors",
+            "## Metrics", "*",
+            "## Labels", "*",
+            "## Specifications", "*"
           ]
         }
       }
@@ -100,8 +126,9 @@
         "MD043": {
           "match_case": true,
           "headings": [
-            "# Exporter health",
+            "# Exporter Health",
             "## Metrics", "*",
+            "## Labels", "*",
             "## Specifications", "*"
           ]
         }

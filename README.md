@@ -26,11 +26,11 @@ This exporter fetches quotes from [Twelve Data](https://twelvedata.com/) and ser
 
 - 💹 **Quote Surface**: Price, previous close, change, percent change and volume per symbol
 - 🔎 **Per-Scrape Symbols**: The symbol list travels in the scrape URL, not in a config file
-- ⏱️ **Bounded Upstream Calls**: Each request is capped at ten seconds, so a stall cannot hold a scrape open
+- ⏱️ **Bounded Upstream Calls**: Each request is capped at ten seconds by the client
 - 📐 **Indicator Examples**: RSI written as a recording rule, in [`prometheus.rules.sample.yml`](./prometheus.rules.sample.yml)
 
 > [!IMPORTANT]
-> The exporter refuses to start without an API key, so generate one first — see [Getting Started — Authentication](https://twelvedata.com/docs#authentication).
+> The exporter refuses to start without an API key — generate one from [Getting Started](https://twelvedata.com/docs#authentication).
 
 > [!NOTE]
 > The exporter spends one credit per symbol per scrape, so the symbol count and the scrape interval together decide whether a plan holds. See [Pricing](https://twelvedata.com/pricing), [Credits](https://support.twelvedata.com/en/articles/5615854-credits) and [Stock Exchanges](https://support.twelvedata.com/en/collections/2787973-stock-exchanges).
@@ -63,22 +63,11 @@ See [Prometheus Configuration](#prometheus-configuration) for the job and the re
 
 ## Flags
 
-`twelvedata-exporter --help` prints every flag, and [`docs/help.md`](docs/help.md) carries the same list.
+`twelvedata-exporter --help` prints every flag, and [`docs/help.md`](docs/help.md) carries it with notes.
 
-| Flag                   | Default   | Description                    |
-| :--------------------- | :-------- | :----------------------------- |
-| `--twelvedata.api-key` | —         | Twelve Data API key (required) |
-| `--web.listen-address` | `0.0.0.0` | Address the exporter binds to  |
-| `--web.listen-port`    | `10016`   | Port the exporter listens on   |
-| `--web.scrape-path`    | `/price`  | Path the metrics are served on |
-
-## Environment Variables
-
-| Variable             | Description                    |
-| :------------------- | :----------------------------- |
-| `TWELVEDATA_API_KEY` | Twelve Data API key (required) |
-
-`TWELVEDATA_API_KEY` and `--twelvedata.api-key` carry the same value, but the flag reaches the process table where every account on the host reads it, so prefer the environment variable. The exporter exits at start-up when neither is set.
+- `--twelvedata.api-key` is the one required flag, and `TWELVEDATA_API_KEY` fills it.
+- `--web.listen-address`, `--web.listen-port` and `--web.scrape-path` place the endpoint.
+- No `--collector.*` flag exists, so every scrape publishes the whole quote surface.
 
 ## Endpoints
 
@@ -87,10 +76,16 @@ The exporter serves two endpoints:
 - `/` — landing page, which prints the query format when reached at <http://localhost:10016/>
 - `/price` — metrics endpoint, configurable via `--web.scrape-path`
 
-> [!IMPORTANT]
-> The `symbols` parameter takes a comma-separated list and may repeat, and every occurrence is concatenated into one list. A request carrying none returns 200 with an empty body, so Prometheus counts that scrape as successful while every series is absent — alert on the absence of `twelvedata_price`, not on `up`.
+See [Endpoints](docs/README.md#endpoints) for the method and status each keeps, and [Scrape Path](docs/README.md#scrape-path) for how `symbols` is read.
 
 ## Metrics
+
+The exporter publishes one quote surface and its own health, catalogued in `docs/`:
+
+| Page                                  | Covers                                          |
+| :------------------------------------ | :---------------------------------------------- |
+| **[Collectors](docs/collectors.md)**  | The five quote series, their labels and meaning |
+| **[Exporter health](docs/health.md)** | The exporter's own series and how to read them  |
 
 Every quote series is a gauge, and one scrape publishes all five for each symbol it resolved:
 
@@ -102,17 +97,11 @@ Every quote series is a gauge, and one scrape publishes all five for each symbol
 | `twelvedata_change_percent`       | Gauge | Change since the previous close, in percent |
 | `twelvedata_volume`               | Gauge | Trading volume during the bar               |
 
-The same four labels are attached to all five, and only `symbol` is chosen by the operator:
-
-| Label      | Holds                                       |
-| :--------- | :------------------------------------------ |
-| `symbol`   | The symbol as the scrape URL spelled it     |
-| `name`     | The instrument name the quote carried       |
-| `exchange` | The exchange the quote was taken from       |
-| `currency` | The currency the row's prices are quoted in |
+> [!NOTE]
+> See [`docs/README.md`](docs/README.md) for the absence, scrape-path and counter rules every series shares.
 
 > [!IMPORTANT]
-> `twelvedata_price` is computed as `previous_close + change` rather than read from the quote's `close` field, so it agrees with the two series beside it at every instant. A field that fails to parse becomes `0`, which no label distinguishes from a genuine zero. A symbol whose request fails is skipped, so its series are absent rather than zero.
+> A symbol whose request fails is skipped rather than published as zero, and the scrape still answers 200. Alert on `absent(twelvedata_price)` rather than on `up`, which stays 1 through every upstream failure.
 
 ### Exporter Health Metrics
 
@@ -124,12 +113,12 @@ These series describe the exporter itself rather than the quotes it fetches. The
 | `twelvedata_failed_queries_total`   | Counter | Count of failed queries                 |
 | `twelvedata_query_duration_seconds` | Summary | Duration of queries to the upstream API |
 
-> [!IMPORTANT]
-> Read none of the three as a health signal without [`docs/health.md`](docs/health.md). `twelvedata_failed_queries_total` has no increment path and stays `0`, and `twelvedata_query_duration_seconds` observes an instant against itself, so its `_sum` carries no latency either.
+> [!NOTE]
+> Read none of the three without [Specifications](docs/health.md#specifications): one never increments and one measures nothing.
 
-## Use Cases
+## Examples
 
-### Basic Usage
+### Command Lines
 
 No symbol is named until a scrape arrives, so the exporter starts with the key alone.
 
@@ -144,20 +133,16 @@ Open <http://localhost:10016/> for the query format and the example URLs it prin
 
 #### Job Configuration Example
 
-Add the job from [`prometheus.sample.yml`](./prometheus.sample.yml) to your Prometheus configuration. The exporter reads its symbols from `params.symbols`, so that list and the job's `scrape_interval` set the credit spend.
+Add the job from [`prometheus.sample.yml`](./prometheus.sample.yml) to your Prometheus configuration.
 
 #### Recording Rules Configuration Example
 
-Add the rules from [`prometheus.rules.sample.yml`](./prometheus.rules.sample.yml) to your configuration. They derive the indicators once per evaluation rather than in every dashboard query.
+Add the rules from [`prometheus.rules.sample.yml`](./prometheus.rules.sample.yml) to your Prometheus configuration.
 
 ## Contributing
 
-See [`CONTRIBUTING.md`](CONTRIBUTING.md) for the `make` targets, the Docker build and the release process.
-
-## Acknowledgement
-
-I ran [Marco Paganini](https://github.com/marcopaganini)'s [quotes-exporter](https://github.com/marcopaganini/quotes-exporter) until an upstream endpoint change broke it and it was archived. This one builds on his, with thanks to him and to [Tristan Colgate-McFarlane](https://github.com/tcolgate), whose [yquotes-exporter](https://github.com/tcolgate/yquotes_exporter) came first.
+See [`CONTRIBUTING.md`](CONTRIBUTING.md) for the development setup, the tests and the conventions.
 
 ## License
 
-MIT. The binary statically links Apache-2.0, MIT and BSD 3-Clause dependencies, whose notices are reproduced in [`NOTICE`](NOTICE) and shipped alongside [`LICENSE`](LICENSE) in every release archive and container image.
+MIT. This exporter builds on [quotes-exporter](https://github.com/marcopaganini/quotes-exporter) and [yquotes-exporter](https://github.com/tcolgate/yquotes_exporter), which came before it. The binary statically links Apache-2.0, MIT and BSD 3-Clause dependencies, whose notices are reproduced in [`NOTICE`](NOTICE) and shipped alongside [`LICENSE`](LICENSE) in every release archive and container image.

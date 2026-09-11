@@ -32,7 +32,7 @@ This exporter holds one credential, and `--twelvedata.api-key` and `TWELVEDATA_A
 
 ## Egress Paths
 
-Each scrape reaches `https://api.twelvedata.com/quote` once per symbol under a ten second timeout, so a stalled upstream ends the request rather than holding the scrape open.
+Each scrape reaches `https://api.twelvedata.com/quote` once per symbol under a ten second timeout. See [Scrape Path](docs/README.md#scrape-path) for what that bounds and what it does not.
 
 ### Credential
 
