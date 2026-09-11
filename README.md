@@ -27,7 +27,7 @@ This exporter fetches quotes from [Twelve Data](https://twelvedata.com/) and ser
 - 💹 **Quote Surface**: Price, previous close, change, percent change and volume per symbol
 - 🔎 **Per-Scrape Symbols**: The symbol list travels in the scrape URL, not in a config file
 - ⏱️ **Bounded Upstream Calls**: Each request is capped at ten seconds by the client
-- 📐 **Indicator Examples**: RSI written as a recording rule, in [`prometheus.rules.sample.yml`](./prometheus.rules.sample.yml)
+- 📐 **Indicator Examples**: RSI as a recording rule, demonstrating the mechanism rather than a signal
 
 > [!IMPORTANT]
 > The exporter refuses to start without an API key — generate one from [Getting Started](https://twelvedata.com/docs#authentication).

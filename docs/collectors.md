@@ -29,17 +29,18 @@ it is the reply's own spelling rather than the one the scrape URL used, so `?sym
 
 **`exchange`**
 
-it carries the venue name where the reply also offers a MIC, and the MIC never becomes a label, so a live `AAPL` reply labels `NASDAQ` while its `mic_code` reads `XNGS`.
+it carries the venue name where the reply also offers a MIC, and the MIC never becomes a label. A live `AAPL` reply labels `NASDAQ` while its `mic_code` reads `XNGS`, against the `XNAS` the upstream documentation shows.
 
 **`name`**
 
 it is whatever the live reply spells, and the documentation and the live service disagree. The documented `AAPL` example gives `Apple Inc` where a live reply gives `Apple Inc.`, and a changed value renames every series carrying it.
 
 - A cross-listing quotes in its own currency, so ranking across symbols means little.
+- A bare symbol resolves to one listing, which `exchange`, `mic_code` and `country` narrow.
 
 **`EUR/USD` and `BTC/USD`**
 
-an instrument outside equities drops the fields the labels need, so either reply leaves `currency` empty and reads a parsed `0` for volume. Both markets also keep `is_market_open` true around the clock.
+an instrument outside equities drops the fields the labels need — `currency`, `mic_code`, `volume` and `average_volume` — so either reply leaves `currency` empty and reads a parsed `0` for volume. Both markets also keep `is_market_open` true around the clock.
 
 ## Specifications
 
@@ -64,7 +65,7 @@ it counts only what traded inside the current bar, which is why it is a gauge: a
 
 **`twelvedata_change_percent`**
 
-it moves on a corporate action as it moves on a trade. `/quote` takes no `adjust` parameter, so an unadjusted four-for-one split reads as a −75% move and no threshold on magnitude separates one from a crash.
+it moves on a corporate action as it moves on a trade. `/time_series` takes an `adjust` parameter defaulting to `splits` where `/quote` takes none, so an unadjusted four-for-one split reads as a −75% move and no threshold on magnitude separates one from a crash.
 
 **`dp`**
 
@@ -77,6 +78,10 @@ it sets the precision of every price field, five places by default, and rounds t
 **`is_market_open` and `datetime`**
 
 they reach no series. The reply carries both and the exporter publishes neither, while Prometheus stamps each sample with scrape time, so a repeated out-of-session bar is indistinguishable from a live one.
+
+**`prometheus.rules.sample.yml`**
+
+it derives its RSI from scrape samples rather than from bars, and a session repeats one daily bar across every scrape in it, so the period the rule measures is wall-clock. It demonstrates the mechanism rather than carrying a trading signal.
 
 > [!IMPORTANT]
 > These names, types and labels are the contract a Prometheus configuration is written against, so a change to any of them is SemVer-signalled and ships with its own [CHANGELOG](../CHANGELOG.md) entry.
