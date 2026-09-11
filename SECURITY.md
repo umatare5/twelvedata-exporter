@@ -46,7 +46,8 @@ Each scrape reaches `https://api.twelvedata.com/quote` once per symbol under a t
 ### Cost
 
 - **A scrape spends money** — `/quote` costs one credit per symbol.
-- **The plan allowance is per minute** — the symbol count and the scrape interval set the spend.
+- **The plan allowance is per minute** — it counts requests, which `/api_usage` reports as `plan_limit`.
+- **The spend follows the scrape** — the symbol count and the scrape interval set it.
 
 ## Out of Scope
 
