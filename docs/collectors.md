@@ -35,12 +35,12 @@ it carries the venue name where the reply also offers a MIC, and the MIC never b
 
 it is whatever the live reply spells, and the documentation and the live service disagree. The documented `AAPL` example gives `Apple Inc` where a live reply gives `Apple Inc.`, and a changed value renames every series carrying it.
 
-- A cross-listing quotes in its own currency, so ranking across symbols means little.
+**`currency`**
+
+it is fixed by the venue the request resolved to rather than by the symbol asked for.
+
 - A bare symbol resolves to one listing, which `exchange`, `mic_code` and `country` narrow.
-
-**`EUR/USD` and `BTC/USD`**
-
-an instrument outside equities drops the fields the labels need — `currency`, `mic_code`, `volume` and `average_volume` — so either reply leaves `currency` empty and reads a parsed `0` for volume. Both markets also keep `is_market_open` true around the clock.
+- A cross-listing quotes in its own currency, so ranking across symbols means little.
 
 ## Specifications
 
@@ -67,6 +67,10 @@ it counts only what traded inside the current bar, which is why it is a gauge: a
 
 it moves on a corporate action as it moves on a trade. `/time_series` takes an `adjust` parameter defaulting to `splits` where `/quote` takes none, so an unadjusted four-for-one split reads as a −75% move and no threshold on magnitude separates one from a crash.
 
+**`EUR/USD` and `BTC/USD`**
+
+an instrument outside equities drops the fields the labels need — `currency`, `mic_code`, `volume` and `average_volume` — so either reply leaves `currency` empty and reads a parsed `0` for volume. Both markets also keep `is_market_open` true around the clock.
+
 **`dp`**
 
 it sets the precision of every price field, five places by default, and rounds to decimal places rather than to significant figures, so the fields arrive as strings to be parsed.
@@ -84,4 +88,4 @@ they reach no series. The reply carries both and the exporter publishes neither,
 it derives its RSI from scrape samples rather than from bars, and a session repeats one daily bar across every scrape in it, so the period the rule measures is wall-clock. It demonstrates the mechanism rather than carrying a trading signal.
 
 > [!IMPORTANT]
-> These names, types and labels are the contract a Prometheus configuration is written against, so a change to any of them is SemVer-signalled and ships with its own [CHANGELOG](../CHANGELOG.md) entry.
+> These names, types and labels are a contract; see [Code Style](../CONTRIBUTING.md#code-style) for what changing one costs.

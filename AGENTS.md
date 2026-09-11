@@ -79,7 +79,7 @@ These are the invariants a change has to hold, and the upstream behaviours behin
 - **What `previous_close` means depends on the interval**, and the exporter asks for none, so the upstream default decides what the change series measures.
 - **A corporate action moves the price without a trade**, and `/quote` cannot adjust for one, so no threshold on the magnitude of a change separates one from a crash.
 - **Resolution picks the venue, and its strings drift**, renaming series. See [Labels](docs/collectors.md#labels).
-- **Nothing published carries market state**, so a stale bar reads as a live one.
+- **Nothing published carries market state**, so a stale bar reads as a live one. See [Specifications](docs/collectors.md#specifications).
 
 > [!IMPORTANT]
 > Write a sentence here only after a live reply showed the behaviour. See [Documentation](CONTRIBUTING.md#documentation) for why, and the page that owns each fact for the measured values.
