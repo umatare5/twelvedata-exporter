@@ -4,11 +4,11 @@ Reference pages for twelvedata-exporter.
 
 The [README](../README.md) covers getting the exporter running and scraped. These pages carry the catalogues, the rules every series obeys and the flags that reach them.
 
-| Page                        | Focus                                      |
-| :-------------------------- | :----------------------------------------- |
-| [Collectors](collectors.md) | The quote series, their labels and meaning |
-| [Health](health.md)         | The exporter's own series and how to read  |
-| [Help](help.md)             | Flags and defaults, as `--help` prints     |
+| Page                        | Focus                                          |
+| :-------------------------- | :--------------------------------------------- |
+| [Collectors](collectors.md) | The quote series, their labels and meaning     |
+| [Health](health.md)         | The exporter's own series and how to read them |
+| [Help](help.md)             | Flags and defaults, as `--help` prints         |
 
 ## Technical Information
 
@@ -37,10 +37,11 @@ The [README](../README.md) covers getting the exporter running and scraped. Thes
 - **A failed symbol goes absent** — its five series are omitted and the scrape still answers 200.
 - **A field that fails to parse reads `0`** — no label separates that from a genuine zero.
 - **Alert on `absent(twelvedata_price)`** — never on `up`, which stays 1 through every failure.
-- **An upstream error looks like an empty quote** — a rejected key or an unknown symbol decodes into the same struct with every field empty. The exporter rejects it on the missing name, never on the status.
+- **An upstream error looks like an empty quote** — it arrives as a `code`/`message`/`status` object that decodes into the same struct with every field empty.
+- **The status carries the discriminator the client ignores** — a rejected key answers `401` and an unknown symbol `404`, yet the rejection turns on the missing name.
 
 > [!IMPORTANT]
-> [Collectors](collectors.md#specifications) names the fields each instrument type drops and what a zero then means.
+> [Specifications](collectors.md#specifications) names the fields each instrument type drops and what a zero then means.
 
 ### Counter Semantics
 

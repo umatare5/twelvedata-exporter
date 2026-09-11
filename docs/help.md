@@ -27,4 +27,5 @@ GLOBAL OPTIONS:
 - Either form carries the same value, but the flag reaches the process table where every account on the host can read it, so prefer the variable.
 - An unset key stops start-up as a required flag; an empty one stops it in validation.
 - `--web.scrape-path` moves the metrics endpoint without changing what it needs, so a relocated path still answers only to a `symbols` query.
+- The path is unvalidated: a value with no leading `/`, or `/` itself, panics at start-up.
 - `--web.listen-address` is printed verbatim in the landing page's example links, so the `0.0.0.0` default renders links that are not usable as shown.

@@ -4,17 +4,16 @@ This is the whole set of series the exporter publishes about itself, and none of
 
 ## Metrics
 
-| Metric                              | Type    | Description                             |
-| :---------------------------------- | :------ | :-------------------------------------- |
-| `twelvedata_queries_total`          | Counter | Count of completed queries              |
-| `twelvedata_failed_queries_total`   | Counter | Count of failed queries                 |
-| `twelvedata_query_duration_seconds` | Summary | Duration of queries to the upstream API |
+| Metric                              | Type    | Description                                         |
+| :---------------------------------- | :------ | :-------------------------------------------------- |
+| `twelvedata_queries_total`          | Counter | Count of completed queries                          |
+| `twelvedata_failed_queries_total`   | Counter | Count of failed queries                             |
+| `twelvedata_query_duration_seconds` | Summary | Duration of queries to the upstream API             |
+| `twelvedata_http_requests_total`    | Counter | Declared with the quote labels, never given a child |
 
 ## Labels
 
-None of these series carries a label.
-
-The process and Go runtime collectors are built on a second registry that no handler serves, so no `go_` or `process_` series reach a scrape either.
+None of these series carries a label. `twelvedata_http_requests_total` declares the four quote labels and never receives a value for them.
 
 ## Specifications
 
@@ -39,6 +38,7 @@ it observes an instant against itself rather than an elapsed interval, so `_sum`
 
 **The registry `/price` serves**
 
-it carries the quote series alongside these three, built fresh for each scrape, so the three are a part of that registry rather than the whole of it.
+it is built fresh for each scrape and carries the quote series alongside these four, so they are a part of it rather than the whole of it.
 
-- `twelvedata_http_requests_total` is declared with the quote labels but never given a child, so it publishes nothing at all rather than publishing zero.
+- The process and Go collectors go on a registry no handler serves, so no `go_` series appear.
+- `twelvedata_http_requests_total` gets no child, so it publishes nothing rather than zero.
