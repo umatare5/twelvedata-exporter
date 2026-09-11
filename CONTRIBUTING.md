@@ -25,6 +25,9 @@ Both carry `--lint-fatal` because `promtool` otherwise prints a lint finding and
 - **The first one sets conventions** — it has none to follow, so its package takes its shape.
 - **The upstream is reachable only from inside** — `baseURL` is unexported.
 - **A test in `internal` redirects it** — it points at an `httptest` server, which one outside cannot.
+- **`apikey=demo` proves reachability, not behaviour** — a few symbols answer and the rest `401`.
+- **A demo request takes one symbol** — a comma-separated list comes back `401` whatever it names.
+- **A captured reply stays out of the tree** — it may carry account-level detail.
 
 ## Code Style
 
@@ -34,11 +37,14 @@ The metric names, HELP strings, types and labels are the contract a Prometheus c
 
 Every fact has one page that owns it, and the other pages link to it rather than restating it.
 
-| Page             | Owns                                   |
-| :--------------- | :------------------------------------- |
-| `README.md`      | What it is, how to run and scrape it   |
-| `docs/health.md` | The exporter's own health series       |
-| `docs/help.md`   | The verbatim `--help` transcript       |
-| `AGENTS.md`      | The upstream behaviours a change holds |
+| Page                 | Owns                                    |
+| :------------------- | :-------------------------------------- |
+| `README.md`          | What it is, how to run and scrape it    |
+| `docs/README.md`     | The scrape path, endpoints and absence  |
+| `docs/collectors.md` | The quote series and their labels       |
+| `docs/health.md`     | The exporter's own health series        |
+| `docs/help.md`       | The verbatim `--help` transcript        |
+| `SECURITY.md`        | The credential, the egress and the cost |
+| `AGENTS.md`          | The invariants a change has to hold     |
 
-A sentence in `AGENTS.md` about what the API returns is written only after a live reply showed it, because the documentation and the live service disagree. The documented `AAPL` example gives `mic_code` `XNAS` where a live reply gives `XNGS`, and a changed value renames every series that carries it.
+A sentence about what the API returns is written only after a live reply showed it, because the documentation and the live service disagree. See [Labels](docs/collectors.md#labels) for the drift that has been measured.
