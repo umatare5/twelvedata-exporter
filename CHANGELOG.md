@@ -10,6 +10,7 @@ Notable changes to the metric surface, one section per release, listing the pull
 - [#69](https://github.com/umatare5/twelvedata-exporter/pull/69) — Stop an environment variable from overriding an explicit flag
 - [#70](https://github.com/umatare5/twelvedata-exporter/pull/70) — Link the shared baseline and narrow the release archive
 - [#71](https://github.com/umatare5/twelvedata-exporter/pull/71) — Split the reference pages out of the README
+- [#72](https://github.com/umatare5/twelvedata-exporter/pull/72) — State each invariant once and link to its detail
 
 ## [v1.2.1]
 
