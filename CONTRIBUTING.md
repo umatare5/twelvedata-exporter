@@ -25,7 +25,7 @@ Both carry `--lint-fatal` because `promtool` otherwise prints a lint finding and
 - **The first one sets conventions** — it has none to follow, so its package takes its shape.
 - **The upstream is reachable only from inside** — `baseURL` is unexported.
 - **A test in `internal` redirects it** — it points at an `httptest` server, which one outside cannot.
-- **`apikey=demo` proves reachability, not behaviour** — a few symbols answer and the rest `401`.
+- **The `demo` key proves reachability, not behaviour** — a few symbols answer and the rest `401`.
 - **A demo request takes one symbol** — a comma-separated list comes back `401` whatever it names.
 - **A captured reply stays out of the tree** — it may carry account-level detail.
 

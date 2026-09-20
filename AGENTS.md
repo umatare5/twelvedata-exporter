@@ -71,7 +71,7 @@ These are the invariants a change has to hold, and the upstream behaviours behin
 - **A credit is spent per symbol, not per request**, so batching would not lower it. See [Scrape Path](docs/README.md#scrape-path).
 - **An error decodes into the quote struct without failing.** The status mirrors the error code and the client never reads it, so absence is the only signal. See [Absence](docs/README.md#absence).
 - **Every price field is a string whose precision the upstream sets**, so parse rather than assume, and expect the field to be missing. See [Specifications](docs/collectors.md#specifications).
-- **The key travels in the query string today**, which the header form would avoid, so it reaches every proxy and access log along the path. See [Credential](SECURITY.md#credential).
+- **An `apikey` parameter beats the header**, which is why the symbol a scrape names is encoded rather than interpolated raw into the query. See [Credential](SECURITY.md#credential).
 
 ### The Market
 
