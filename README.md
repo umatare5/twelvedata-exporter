@@ -114,7 +114,7 @@ These series describe the exporter itself rather than the quotes it fetches. The
 | `twelvedata_query_duration_seconds` | Summary | Duration of queries to the upstream API |
 
 > [!NOTE]
-> Read none of the three without [Specifications](docs/health.md#specifications): one never increments and one measures nothing.
+> Read none of the three without [Specifications](docs/health.md#specifications): one never increments and one counts scrapes.
 
 ## Examples
 

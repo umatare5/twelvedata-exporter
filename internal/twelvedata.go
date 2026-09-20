@@ -106,6 +106,8 @@ func (t *TwelvedataClient) GetQuote(symbol string) (*QuoteResponse, error) {
 		return nil, err
 	}
 
+	start := time.Now()
+
 	resp, err := client.Do(req)
 	if err != nil {
 		log.Errorf("Error sending request to server: %s", err)
@@ -137,7 +139,7 @@ func (t *TwelvedataClient) GetQuote(symbol string) (*QuoteResponse, error) {
 		return nil, err
 	}
 
-	queryDuration.Observe(time.Since(time.Now()).Seconds())
+	queryDuration.Observe(time.Since(start).Seconds())
 
 	return &data, nil
 }
