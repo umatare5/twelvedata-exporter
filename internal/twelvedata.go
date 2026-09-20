@@ -4,9 +4,9 @@ package internal
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"io"
 	"net/http"
+	"net/url"
 	"time"
 
 	"github.com/prometheus/client_golang/prometheus"
@@ -92,19 +92,26 @@ const apiRequestTimeout = 10 * time.Second
 
 // GetQuote sends GET request to Twelvedata API.
 func (t *TwelvedataClient) GetQuote(symbol string) (*QuoteResponse, error) {
+	// Go forwards the credential header to a subdomain of the initial host, so no redirect is followed.
 	client := &http.Client{
 		Timeout: apiRequestTimeout,
+		CheckRedirect: func(*http.Request, []*http.Request) error {
+			return http.ErrUseLastResponse
+		},
 	}
 
+	// An apikey parameter overrides the header upstream, so the symbol is encoded rather than interpolated.
 	req, err := http.NewRequestWithContext(
 		context.Background(),
 		http.MethodGet,
-		fmt.Sprintf(t.baseURL+"/quote?symbol=%s&apikey=%s", symbol, t.apiKey),
+		t.baseURL+"/quote?"+url.Values{"symbol": {symbol}}.Encode(),
 		http.NoBody,
 	)
 	if err != nil {
 		return nil, err
 	}
+
+	req.Header.Set("Authorization", "apikey "+t.apiKey)
 
 	start := time.Now()
 

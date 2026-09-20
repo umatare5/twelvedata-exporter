@@ -12,6 +12,7 @@ Notable changes to the metric surface, one section per release, listing the pull
 - [#71](https://github.com/umatare5/twelvedata-exporter/pull/71) — Split the reference pages out of the README
 - [#72](https://github.com/umatare5/twelvedata-exporter/pull/72) — State each invariant once and link to its detail
 - [#77](https://github.com/umatare5/twelvedata-exporter/pull/77) — Measure the elapsed time of an upstream query
+- [#78](https://github.com/umatare5/twelvedata-exporter/pull/78) — Send the API key in a header rather than the query string
 
 ## [v1.2.1]
 
