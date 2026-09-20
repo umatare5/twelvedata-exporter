@@ -31,10 +31,11 @@ it is declared and registered but never incremented, so it stays `0` whatever th
 
 **`twelvedata_query_duration_seconds`**
 
-it observes an instant against itself rather than an elapsed interval, so `_sum` accumulates nanosecond-scale values instead of latency while `_count` follows the quotes that parsed.
+it times the span from the upstream request to the parsed response, so `_sum` over `_count` is the mean latency of a query that produced a quote.
 
+- The span covers reading the body because the HTTP client returns once the response headers arrive rather than once the whole body has been read.
 - The observation sits after the response is parsed, so a request that failed or returned a nameless quote reaches neither `_count` nor `_sum`.
-- Read `_count` as a success count and take latency from the scrape duration instead.
+- `_count` counts successes rather than attempts, so the 10-second timeout never lands in `_sum`.
 
 **The registry `/price` serves**
 
