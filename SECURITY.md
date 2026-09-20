@@ -40,7 +40,7 @@ Each scrape reaches `https://api.twelvedata.com/quote` once per symbol under a t
 - **The URL names the symbol alone** — the upstream's own access log records no credential.
 - **A parameter beats the header** — the upstream reads the first `apikey` the query carries.
 - **The symbol is encoded** — so no scrape can put an `apikey` parameter there.
-- **No redirect is followed** — Go would forward the header to any `twelvedata.com` subdomain.
+- **No redirect is followed** — Go would forward the header to a subdomain of `api.twelvedata.com`.
 - **An error logs the URL** — which no longer carries the key.
 
 ### Cost
