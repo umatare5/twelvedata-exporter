@@ -59,7 +59,7 @@ export TWELVEDATA_API_KEY="your-twelvedata-api-token"
 **2. Run the exporter with Docker**
 
 ```bash
-docker run -p 10016:10016 -e TWELVEDATA_API_KEY ghcr.io/umatare5/twelvedata-exporter:v1.2.1
+docker run -p 10016:10016 -e TWELVEDATA_API_KEY ghcr.io/umatare5/twelvedata-exporter:v1.3.0
 ```
 
 **3. Scrape it**
@@ -84,7 +84,7 @@ USAGE:
    twelvedata-exporter COMMAND [options...]
 
 VERSION:
-   1.2.1
+   1.3.0
 
 GLOBAL OPTIONS:
    --web.listen-address string, -I string  Set IP address (default: "0.0.0.0")

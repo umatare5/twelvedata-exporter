@@ -4,6 +4,8 @@ Notable changes to the metric surface, one section per release, listing the pull
 
 ## [Unreleased]
 
+## [v1.3.0]
+
 - [#61](https://github.com/umatare5/twelvedata-exporter/pull/61) – Deprecate the per-architecture image tags
 - [#63](https://github.com/umatare5/twelvedata-exporter/pull/63) – Validate the Prometheus samples with promtool
 - [#64](https://github.com/umatare5/twelvedata-exporter/pull/64) – Rework the document set to the house standard
@@ -13,7 +15,7 @@ Notable changes to the metric surface, one section per release, listing the pull
 - [#72](https://github.com/umatare5/twelvedata-exporter/pull/72) – State each invariant once and link to its detail
 - [#77](https://github.com/umatare5/twelvedata-exporter/pull/77) – Measure the elapsed time of an upstream query
 - [#78](https://github.com/umatare5/twelvedata-exporter/pull/78) – Send the API key in a header rather than the query string
-- [#79](https://github.com/umatare5/twelvedata-exporter/pull/79) – Restructure the document set around the README
+- [#79](https://github.com/umatare5/twelvedata-exporter/pull/79) – Rework the document set and hold the release as a draft
 
 ## [v1.2.1]
 
@@ -48,7 +50,8 @@ Notable changes to the metric surface, one section per release, listing the pull
 - [#58](https://github.com/umatare5/twelvedata-exporter/pull/58) – Migrate goreleaser Docker packaging to dockers_v2
 - [#59](https://github.com/umatare5/twelvedata-exporter/pull/59) – Update golangci-lint to v2.13.2 and bump version to v1.2.0
 
-[Unreleased]: https://github.com/umatare5/twelvedata-exporter/compare/v1.2.1...HEAD
+[Unreleased]: https://github.com/umatare5/twelvedata-exporter/compare/v1.3.0...HEAD
+[v1.3.0]: https://github.com/umatare5/twelvedata-exporter/releases/tag/v1.3.0
 [v1.2.1]: https://github.com/umatare5/twelvedata-exporter/releases/tag/v1.2.1
 [v1.2.0]: https://github.com/umatare5/twelvedata-exporter/releases/tag/v1.2.0
 
@@ -56,5 +59,5 @@ Notable changes to the metric surface, one section per release, listing the pull
 >
 > **BREAKING CHANGE**
 >
-> - Per-arch image tags (`latest-amd64`, `v1.1.0-arm64`, and the other `-amd64`/`-arm64` suffixes) and the standalone `v1` tag are no longer published; the existing ones stay frozen at v1.1.0. Pull the multi-arch tags (`latest`, `vX.Y.Z`, `vX.Y`) instead.
+> - Per-arch image tags (`latest-amd64`, `v1.1.0-arm64`, and the other `-amd64`/`-arm64` suffixes) are no longer published; the existing ones stay frozen at v1.1.0. Pull the multi-arch tags (`latest`, `vX`, `vX.Y`, `vX.Y.Z`) instead.
 > - `docker run` without arguments now starts the exporter instead of printing help, matching the README quick start.
