@@ -44,7 +44,7 @@ The exporter exposes a listening socket for incoming HTTP scrapes.
 
 - **Reach** – The exporter listens on all interfaces by default, which accepts every host that routes to it.
 - **No allowlist** – The exporter filters no sender, which leaves the packet filter or authenticating proxy to enforce it.
-- **Restriction** – Put a packet filter or an authenticating proxy in front to restrict access.
+- **Restriction** – `--web.listen-address` narrows the bind, and anything finer needs a packet filter or a proxy.
 
 ## Egress Paths
 
