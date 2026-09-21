@@ -1,50 +1,38 @@
 # Contributing
 
-The [shared contribution guide](https://github.com/umatare5/.github/blob/main/CONTRIBUTING.md) covers what every exporter shares. This page carries the rest.
+Thank you for your interest in contributing to the twelvedata-exporter.
+
+Please follow **[the shared contribution guide](https://github.com/umatare5/.github/blob/main/CONTRIBUTING.md)**, which covers:
+
+- **Development** – the tools to install and the order the pre-commit hooks run in.
+- **Command** – the `make` targets and what each one does.
+- **Testing** – test placement, mutation checks and what a fixture must carry.
+- **Documentation** – page ownership, pinned headings and the verbatim `--help` transcript.
+- **Release** – the three files a release touches and what a push to `main` triggers.
+- **Pull Requests** – the branch, commit and changelog steps, and what never enters a commit.
+
+This page specifies what is particular to this one.
 
 ## Development
 
-CI runs Format and Lint, Test and Build, Coverage, Prometheus Rules and CodeQL on every pull request, and govulncheck, actionlint, markdownlint and Link Check when the paths each one watches change.
+These points are where this repository departs from the shared defaults.
 
-- **The coverage threshold is zero** — no package carries a test yet, so the job gates on nothing.
-- **The job publishes a figure** — it tightens with the first test that lands.
-- **The image declares port 10016** — `EXPOSE` publishes nothing, so `docker run -p` does.
-
-Two commands reproduce the `Prometheus Rules` job locally.
-
-```bash
-promtool check rules --lint all --lint-fatal prometheus.rules.sample.yml
-promtool check config --lint all --lint-fatal prometheus.sample.yml
-```
-
-Both carry `--lint-fatal` because `promtool` otherwise prints a lint finding and still exits 0, so the job would pass over a rule it had just faulted.
+- **Do not assume every check runs.** Four are path-filtered: govulncheck, markdownlint, Link Check and actionlint.
+- **Do not lean on the coverage gate.** No test exists yet, so CI passes at 0 percent coverage until the first one lands.
+- **Copy a flag change into the README.** The `--help` block lives there, and nothing regenerates it.
 
 ## Testing
 
-- **The tree carries no test** — `make test-unit` finds no `*_test.go` anywhere.
-- **The first one sets conventions** — it has none to follow, so its package takes its shape.
-- **The upstream is reachable only from inside** — `baseURL` is unexported.
-- **A test in `internal` redirects it** — it points at an `httptest` server, which one outside cannot.
-- **The `demo` key proves reachability, not behaviour** — a few symbols answer and the rest `401`.
-- **A demo request takes one symbol** — a comma-separated list comes back `401` whatever it names.
-- **A captured reply stays out of the tree** — it may carry account-level detail.
+No Go test exists yet, so `promtool` lints the sample rules and nothing asserts behaviour.
 
-## Code Style
+- **Check the rules with `promtool` locally.** `--lint-fatal` is required, because a lint finding otherwise still exits 0.
+- **Redirect `baseURL` to an `httptest` server.** It is unexported, so only a test inside `internal` can rewrite it.
+- **Probe reachability with the `demo` key.** A few symbols answer and the rest return `401`, so it proves the path alone.
+- **Name one symbol per demo request.** A comma-separated list comes back `401` whatever instruments it names.
 
-The metric names, HELP strings, types and labels are the contract a Prometheus configuration is written against, so changing one breaks the alerts and dashboards built on it. A change to any of them is SemVer-signalled and ships with its own CHANGELOG entry.
+The `Prometheus Rules` job runs these two commands.
 
-## Documentation
-
-Every fact has one page that owns it, and the other pages link to it rather than restating it.
-
-| Page                 | Owns                                    |
-| :------------------- | :-------------------------------------- |
-| `README.md`          | What it is, how to run and scrape it    |
-| `docs/README.md`     | The scrape path, endpoints and absence  |
-| `docs/collectors.md` | The quote series and their labels       |
-| `docs/health.md`     | The exporter's own health series        |
-| `docs/help.md`       | The verbatim `--help` transcript        |
-| `SECURITY.md`        | The credential, the egress and the cost |
-| `AGENTS.md`          | The invariants a change has to hold     |
-
-A sentence about what the API returns is written only after a live reply showed it, because the documentation and the live service disagree. See [Labels](docs/collectors.md#labels) for the drift that has been measured.
+```bash
+promtool check config --lint all --lint-fatal prometheus.sample.yml
+promtool check rules --lint all --lint-fatal prometheus.rules.sample.yml
+```

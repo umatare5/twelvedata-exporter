@@ -1,55 +1,61 @@
 # Security Policy
 
-The [shared security policy](https://github.com/umatare5/.github/blob/main/SECURITY.md) covers what every exporter here shares. This page carries the rest.
+Please follow **[the shared security policy](https://github.com/umatare5/.github/blob/main/SECURITY.md)**, which covers:
+
+- **Supported Versions** – only the latest release carries fixes, so reproduce against it.
+- **Reporting a Vulnerability** – the private advisory path and what the response promises.
+- **What to Include** – the credentials and addresses to redact, and the fields to send.
+- **Exposure** – the unauthenticated surface and the container the image ships.
+- **Out of Scope** – findings that belong to the monitored system or to an operator's own configuration.
+
+This page specifies what is particular to this one.
 
 ## What to Include
 
+Reproduction needs **the collector flags** in force and **the symbols**.
+
 Redact these before reporting, in addition to the credentials the shared policy names.
 
-- The Twelve Data API key, from a flag, an environment variable, a process listing or a log line
-- The account it resolves to, and any credit balance or billing figure tied to that account
-- The `symbols` list of a private scrape URL, which names the instruments being watched
-
-A scrape URL carries `symbols` alone, so reproduction needs it together with the flags in force.
+- **Tokens** – The Twelve Data API key, from a flag, an environment variable, a process listing or a log line
+- **Account** – The account the key resolves to, and any credit balance or billing figure tied to it
 
 ## Exposure
 
-This exporter holds one credential, and `--twelvedata.api-key` and `TWELVEDATA_API_KEY` are its only sources, so nothing arriving in a scrape can set it. The scrape path answers a `symbols` query and reads no other parameter.
+This exporter holds one credential, **the Twelve Data API key**.
 
-- **The variable is safer** — the flag reaches a process table every account on the host reads.
-- **The environment is narrower** — `/proc/<pid>/environ` opens to the owner and root alone.
-- **The log records the URI** — every request to the scrape path is logged whole by the exporter.
-- **The symbol list lands there** — so does whatever else the query carried.
-- **The labels name the instrument** — `symbol`, `name`, `exchange` and `currency` carry it.
-- **The endpoint is unauthenticated** — one scrape discloses the whole watch list.
-- **The landing page is fixed** — `/` prints example symbols compiled into the binary.
-- **No operator choice reaches it** — the page names the listen address and the scrape path alone.
+- **Variables** – The environment is narrower than flags, because `/proc/<pid>/environ` opens to the owner and root alone.
+- **Flags** – The flag reaches a process table every account on the host reads, making the variable safer.
+- **Logs** – Every request to the scrape path is logged whole by the exporter, recording the URI.
+- **Queries** – The symbol list lands in the log, alongside whatever else the query carried.
+- **Labels** – The labels `symbol`, `name`, `exchange` and `currency` carry the instrument names in plaintext.
 
-> [!IMPORTANT]
-> The key reaching a log line, the landing page or a scrape response body is a vulnerability, as is a `symbols` value escaping the URL it arrived in into a metric name or a label name.
->
-> So is a request reaching a host other than `api.twelvedata.com`, or an endpoint other than `/quote`, since both are compiled in and no flag or query moves them.
+## Endpoints
+
+No route authenticates, so the network path the listener sits on is the whole access control. See also [Endpoints](docs/architecture.md#endpoints).
+
+- **Listener** – `--web.listen-address` defaults to `0.0.0.0`, which answers on every interface.
+- **Disclosure** – One scrape discloses the whole watch list for that URL.
+- **Landing page** – The `/` route prints example symbols compiled into the binary.
+- **Isolation** – No operator choice reaches the landing page; it names the listen address and the scrape path alone.
+
+## Ingress Paths
+
+The exporter exposes a listening socket for incoming HTTP scrapes.
+
+- **Reach** – The exporter listens on all interfaces by default, which accepts every host that routes to it.
+- **No allowlist** – The exporter filters no sender, which leaves the packet filter or authenticating proxy to enforce it.
+- **Restriction** – Put a packet filter or an authenticating proxy in front to restrict access.
 
 ## Egress Paths
 
-Each scrape reaches `https://api.twelvedata.com/quote` once per symbol under a ten second timeout. See [Scrape Path](docs/README.md#scrape-path) for what that bounds and what it does not.
+The exporter opens outbound connections only to the Twelve Data API.
 
-### Credential
-
-- **The key travels in a header** — `Authorization: apikey <key>`, the form Twelve Data recommends.
-- **The URL names the symbol alone** — the upstream's own access log records no credential.
-- **A parameter beats the header** — the upstream reads the first `apikey` the query carries.
-- **The symbol is encoded** — so no scrape can put an `apikey` parameter there.
-- **No redirect is followed** — Go would forward the header to a subdomain of `api.twelvedata.com`.
-- **An error logs the URL** — which no longer carries the key.
-
-### Cost
-
-- **A scrape spends money** — `/quote` costs one credit per symbol.
-- **The plan allowance is per minute** — it counts requests, which `/api_usage` reports as `plan_limit`.
-- **The spend follows the scrape** — the symbol count and the scrape interval set it.
+- **Host** – Every API call strictly egresses to `https://api.twelvedata.com/quote` under a ten-second timeout.
+- **Credential** – The client strictly sends the token in the `Authorization` header, keeping it out of URLs and proxy logs.
+- **Cost** – The API cost scales inherently with the requested symbols, because `/quote` costs one credit per symbol.
+- **Scaling** – The exporter repeats the quote call for each requested symbol, scaling the total outbound request count.
 
 ## Out of Scope
 
-- A defect in the Twelve Data service belongs to Twelve Data rather than to this client.
-- Credit or billing exhaustion, which the operator's own symbol count and scrape interval decide.
+- **Origin** – A defect in the Twelve Data service belongs to Twelve Data rather than to this client.
+- **Credit** – Credit or billing exhaustion, which the operator's requirements dictate.
