@@ -8,7 +8,6 @@ dist: tmp/dist
 
 # Build destination
 github_urls:
-  # set to true if you use a self-signed certificate
   skip_tls_verify: false
 
 before:
@@ -38,12 +37,9 @@ builds:
         - cmd: grep -q CGO_ENABLED=0 {{ .Path }}
 
 archives:
-  - name_template: '{{ .ProjectName }}-v{{ .Version }}_{{ .Os }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}'
+  - name_template: "{{ .ProjectName }}-v{{ .Version }}_{{ .Os }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}"
     # Only what a downloaded binary needs beside it: the licence notices its
-    # statically linked dependencies require on redistribution. The exporter
-    # parses none of the files it used to ship, so every one of them is a click
-    # away on the page the archive was downloaded from. The key stays because
-    # GoReleaser's default set omits NOTICE.
+    # statically linked dependencies require on redistribution.
     files:
       - "LICENSE"
       - "NOTICE"
@@ -84,33 +80,29 @@ dockers_v2:
 
 release:
   prerelease: auto
-  draft: false
+  draft: true
   replace_existing_draft: true
   header: |
     ## {{ .ProjectName }} v{{ .Version }}
 
     This release contains the Prometheus Exporter for Twelve Data.
 
+    > [!IMPORTANT]
+    > Read the [CHANGELOG](https://github.com/umatare5/twelvedata-exporter/blob/{{ .Tag }}/CHANGELOG.md) before upgrading.
+
     ### 🐳 Container Images
 
     ```bash
-    # Show the flags
+    # Show the help
     docker run --rm ghcr.io/umatare5/twelvedata-exporter:{{ .Tag }} --help
 
-    # Run the exporter
+    # Run With environment variables
     docker run --rm -p 10016:10016 -e TWELVEDATA_API_KEY ghcr.io/umatare5/twelvedata-exporter:{{ .Tag }}
     ```
 
-    `latest`, `v{{ .Major }}`, `v{{ .Major }}.{{ .Minor }}` and `{{ .Tag }}` each serve `linux/amd64` and `linux/arm64`.
-
-    > [!WARNING]
-    > The per-architecture tags such as `latest-amd64` are deprecated and frozen at v1.1.0. Pull one of the tags above instead.
-
     ### 📦 Binary Installation
 
-    ```bash
-    go install github.com/umatare5/twelvedata-exporter@v{{ .Version }}
-    ```
+    Download a prebuilt binary for your platform from the release assets below.
 
   footer: |
     **Full Changelog**: https://github.com/umatare5/twelvedata-exporter/compare/{{ .PreviousTag }}...{{ .Tag }}
@@ -144,11 +136,11 @@ changelog:
       order: 999
   filters:
     exclude:
-      - '^Merge branch '
-      - '^release:'
-      - '^ci:'
-      - '^test:'
+      - "^Merge branch "
+      - "^release:"
+      - "^ci:"
+      - "^test:"
 
 # Metadata for Go proxy and pkg.go.dev
 metadata:
-  mod_timestamp: '{{ .CommitTimestamp }}'
+  mod_timestamp: "{{ .CommitTimestamp }}"
