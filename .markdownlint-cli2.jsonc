@@ -6,7 +6,6 @@
     "MD004": { "style": "dash" },
     "MD013": false,
     "MD024": { "siblings_only": true },
-    // Two adjacent GitHub alerts cannot be written without a blank line between them
     "MD028": false,
     "MD029": { "style": "ordered" },
     "MD036": false,
@@ -46,7 +45,6 @@
           "match_case": true,
           "headings": [
             "# Changelog",
-            "## [Unreleased]",
             "*"
           ]
         }
@@ -72,7 +70,7 @@
       "config": {
         // The logo, badges and title block are HTML; the heading they carry is an <h1>
         "MD033": {
-          "allowed_elements": ["a", "b", "br", "details", "div", "h1", "img", "p", "picture", "source", "summary"]
+          "allowed_elements": ["a", "b", "br", "div", "h1", "img", "p", "picture", "source", "details", "summary"]
         },
         "MD041": { "allow_preamble": true },
         "MD043": {
@@ -87,6 +85,24 @@
             "## Documentation", "*",
             "## Contributing", "*",
             "## License"
+          ]
+        }
+      }
+    },
+    {
+      "filter": ["SECURITY.md"],
+      "combine": "merge",
+      "config": {
+        "MD043": {
+          "match_case": true,
+          "headings": [
+            "# Security Policy",
+            "## What to Include", "*",
+            "## Exposure", "*",
+            "## Endpoints", "*",
+            "## Ingress Paths", "*",
+            "## Egress Paths", "*",
+            "## Out of Scope"
           ]
         }
       }
@@ -111,30 +127,12 @@
         "MD043": {
           "match_case": true,
           "headings": [
-            "# Architecture & Design",
+            "# Architecture",
             "## Scrape Path", "*",
             "## Endpoints", "*",
             "## Absence", "*",
             "## Counter Semantics", "*",
-            "## Technical Notes", "*"
-          ]
-        }
-      }
-    },
-    {
-      "filter": ["SECURITY.md"],
-      "combine": "merge",
-      "config": {
-        "MD043": {
-          "match_case": true,
-          "headings": [
-            "# Security Policy",
-            "## What to Include", "*",
-            "## Exposure", "*",
-            "## Endpoints", "*",
-            "## Ingress Paths", "*",
-            "## Egress Paths", "*",
-            "## Out of Scope"
+            "## Technical Notes"
           ]
         }
       }
