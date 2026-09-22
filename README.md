@@ -175,19 +175,10 @@ There are several operational examples below.
 
 ### Exporter Configuration
 
-The two patterns below cover the common use cases.
-
-**Minimal Pattern**: With the API key alone, the exporter serves `/price` on `0.0.0.0:10016`.
+With the API key alone, the exporter serves `/price` on `0.0.0.0:10016`.
 
 ```bash
 TWELVEDATA_API_KEY="your-twelvedata-api-token" ./twelvedata-exporter
-```
-
-**Complete Pattern**: Every `--web.*` flag is named, binding the listener to the loopback address.
-
-```bash
-TWELVEDATA_API_KEY="your-twelvedata-api-token" ./twelvedata-exporter \
-  --web.listen-address 127.0.0.1 --web.listen-port 10016 --web.scrape-path /price
 ```
 
 ### Prometheus Configuration
