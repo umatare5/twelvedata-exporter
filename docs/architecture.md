@@ -1,4 +1,4 @@
-# Architecture & Design
+# Architecture
 
 This document preserves the foundational design and architectural principles of the twelvedata-exporter.
 
