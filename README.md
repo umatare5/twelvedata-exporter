@@ -29,50 +29,48 @@ This exporter allows a Prometheus instance to monitor prices of stocks, ETFs, an
 - 🔔 **Signal-based Alerting**: Allow to monitor technical analysis indicators utilizing the alerting rules.
 
 > [!NOTE]
->
 > The Twelvedata API has some limitations based on the license. For example, API limit, accessible market and others. For the limitations, please refer to [twelvedata - Pricing](https://twelvedata.com/pricing) and [Twelvedata Support - Credits](https://support.twelvedata.com/en/articles/5615854-credits).
 
 ## Installation
 
-This exporter supports both container images and OS-specific binaries installations.
-
-**A. Using Container**
+This exporter supports container images and OS-specific binaries.
 
 ```bash
 docker pull ghcr.io/umatare5/twelvedata-exporter
 ```
 
-**B. Using OS-Specific binaries**
-
-Download from [Releases](https://github.com/umatare5/twelvedata-exporter/releases). `linux_(amd64|arm64)`, `darwin_(amd64|arm64)` and `windows_amd64` are supported.
+Or, download the binaries from [Releases](https://github.com/umatare5/twelvedata-exporter/releases). `(linux|darwin)_(amd64|arm64)` and `windows_amd64` are supported.
 
 ## Quick Start
 
 This exporter needs an API key. See the **[Twelve Data Developer Docs](https://twelvedata.com/docs/introduction/overview)** to get an API key first.
 
-**1. Set the API key**
+### 1. Set the API key
 
 ```bash
 export TWELVEDATA_API_KEY="your-twelvedata-api-token"
 ```
 
-**2. Run the exporter with Docker**
+### 2. Run the exporter with Docker
 
 ```bash
 docker run -p 10016:10016 -e TWELVEDATA_API_KEY ghcr.io/umatare5/twelvedata-exporter:v1.3.0
 ```
 
-**3. Scrape it**
+### 3. Scrape the metrics
 
 ```bash
 curl http://localhost:10016/price?symbols=SPY
 ```
 
 > [!TIP]
->
-> See [Metrics](#metrics) for available metrics, and [Prometheus Configuration](#prometheus-configuration) for the job and the alerting rules.
+> See [Metrics](#metrics) for the complete catalogue, and [Prometheus Configuration](#prometheus-configuration) for scrape jobs and recording rules.
 
-## Flags
+## Configuration
+
+This exporter uses command-line flags for all configuration.
+
+### Flags
 
 The exporter supports the following command-line flags:
 
@@ -95,14 +93,14 @@ GLOBAL OPTIONS:
    --version, -v                           print the version
 ```
 
-## Endpoints
+### Endpoints
 
-The exporter serves two endpoints. See [Endpoints](docs/architecture.md#endpoints) for the details.
+The exporter exposes these endpoints. See [Endpoints](docs/architecture.md#endpoints) for what each status code means.
 
-| Path     | Detail                                                                    |
-| :------- | :------------------------------------------------------------------------ |
-| `/`      | Landing page – confirming the exporter is up at <http://localhost:10016/> |
-| `/price` | Metrics endpoint – the scrape path that executes API calls                |
+| Path     | Description                                  |
+| :------- | :------------------------------------------- |
+| `/`      | Landing page, confirming the exporter is up  |
+| `/price` | Metrics endpoint, set by `--web.scrape-path` |
 
 ## Metrics
 
@@ -173,30 +171,42 @@ The following table lists the metrics this exporter publishes. See **Appendix 2*
 
 ## Examples
 
+There are several operational examples below.
+
 ### Exporter Configuration
 
+The two patterns below cover the common use cases.
+
+**Minimal Pattern**: With the API key alone, the exporter serves `/price` on `0.0.0.0:10016`.
+
 ```bash
-$ TWELVEDATA_API_KEY="your-twelvedata-api-token" ./twelvedata-exporter
-INFO[0000] Starting the Twelvedata exporter on 0.0.0.0:10016
+TWELVEDATA_API_KEY="your-twelvedata-api-token" ./twelvedata-exporter
+```
+
+**Complete Pattern**: Every `--web.*` flag is named, binding the listener to the loopback address.
+
+```bash
+TWELVEDATA_API_KEY="your-twelvedata-api-token" ./twelvedata-exporter \
+  --web.listen-address 127.0.0.1 --web.listen-port 10016 --web.scrape-path /price
 ```
 
 ### Prometheus Configuration
 
-There are several Prometheus configuration examples provided below:
+See the following Prometheus configuration examples:
 
 - **Example Job**: Add from [`prometheus.sample.yml`](./prometheus.sample.yml) to your Prometheus.
 - **Example Recording Rules**: Add from [`prometheus.rules.sample.yml`](./prometheus.rules.sample.yml) to your Prometheus.
 
 ## Documentation
 
-The reference page under [`docs/`](docs/) carries the behaviour behind the metrics above.
+The following pages detail additional information.
 
 - **[Architecture](docs/architecture.md)** – the scrape path, the absence rules and others.
 
 ## Contributing
 
-See [`CONTRIBUTING.md`](CONTRIBUTING.md) for the development setup, test conventions and others.
+See [`CONTRIBUTING.md`](CONTRIBUTING.md) for development setup, test conventions and others.
 
 ## License
 
-MIT. The binary statically links Apache-2.0, MIT and BSD 3-Clause dependencies, whose notices are reproduced in [`NOTICE`](NOTICE) and shipped alongside [`LICENSE`](LICENSE) in every release archive and container image.
+MIT. The binary statically links Apache-2.0, MIT and BSD 3-Clause dependencies. Their notices are reproduced in [`NOTICE`](NOTICE) and shipped alongside [`LICENSE`](LICENSE) in every release archive and container image.
