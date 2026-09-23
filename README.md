@@ -64,7 +64,7 @@ curl http://localhost:10016/price?symbols=SPY
 ```
 
 > [!TIP]
-> See [Metrics](#metrics) for the complete catalogue, and [Prometheus Configuration](#prometheus-configuration) for scrape jobs and recording rules.
+> See [Metrics](#metrics) for the complete metrics, and [Prometheus Configuration](#prometheus-configuration) for scrape jobs and recording rules.
 
 ## Configuration
 
