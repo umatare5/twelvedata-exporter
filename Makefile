@@ -63,9 +63,9 @@ clean:
 
 # Docker targets
 # The Dockerfile is written for GoReleaser, which hands docker a context holding
-# the binary and the licence. Building from the repository root instead cannot
-# work: the binary is not there, and .dockerignore excludes it by name if it is.
-# This target assembles the same context.
+# the binary and the license notices. Building from the repository root instead
+# cannot work: the binary is not there, and .dockerignore excludes it by name if
+# it is. This target assembles the same context.
 image:
 	mkdir -p $(IMAGE_DIR)/linux/$(GOARCH)
 	CGO_ENABLED=0 GOOS=linux go build $(BUILD_FLAGS) -o $(IMAGE_DIR)/linux/$(GOARCH)/$(BINARY_NAME) ./cmd
