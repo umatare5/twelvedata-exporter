@@ -4,10 +4,12 @@ exclude_all_private = true
 # support.twelvedata.com answers an automated request for a collection with 401,
 # the docs page renders its fragments with JavaScript so fragment checks cannot
 # resolve it, and the release links name tags that exist only after the release
-# lands.
+# lands. The badge branch is created by the coverage workflow, so it resolves
+# only once that workflow has run on main.
 exclude = [
   "^https://support\\.twelvedata\\.com/",
   "^https://twelvedata\\.com/docs",
   "^https://github\\.com/umatare5/twelvedata-exporter/releases/tag/",
   "^https://github\\.com/umatare5/twelvedata-exporter/compare/",
+  "^https://raw\\.githubusercontent\\.com/umatare5/twelvedata-exporter/badges/coverage\\.svg$",
 ]

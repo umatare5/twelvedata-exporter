@@ -31,7 +31,8 @@ func NewServer(cfg *config.Config) (Server, error) {
 }
 
 // Start configures and launches the HTTP server to serve metrics and help pages.
-func (s *Server) Start() {
+// The routes sit on their own mux, because the default one is process-wide and rejects a second registration.
+func (s *Server) Start() error {
 	reg := prometheus.NewRegistry()
 
 	// Register standard process and Go metrics.
@@ -41,23 +42,20 @@ func (s *Server) Start() {
 	)
 
 	// Register HTTP handlers.
-	http.HandleFunc("/", s.help)
-	http.HandleFunc(s.Config.WebScrapePath, func(w http.ResponseWriter, r *http.Request) {
-		s.priceHandler(w, r)
-	})
+	mux := http.NewServeMux()
+	mux.HandleFunc("/", s.help)
+	mux.HandleFunc(s.Config.WebScrapePath, s.priceHandler)
 
 	listenAddr := s.Config.WebListenAddress + ":" + strconv.Itoa(s.Config.WebListenPort)
 	log.Infof("Starting the Twelvedata exporter on %s", listenAddr)
 	srv := &http.Server{
 		Addr:         listenAddr,
-		Handler:      nil,
+		Handler:      mux,
 		ReadTimeout:  time.Minute,
 		WriteTimeout: time.Minute,
 	}
 
-	if err := srv.ListenAndServe(); err != nil {
-		log.Fatal("Failed to start server: ", err)
-	}
+	return srv.ListenAndServe()
 }
 
 // priceHandler registers Prometheus metrics and serves them via HTTP.

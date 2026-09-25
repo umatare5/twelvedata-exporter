@@ -9,11 +9,10 @@ import (
 
 	"github.com/umatare5/twelvedata-exporter/config"
 	"github.com/umatare5/twelvedata-exporter/internal"
-	"github.com/umatare5/twelvedata-exporter/log"
 )
 
-// Start is the entrypoint of this CLI.
-func Start() {
+// Start builds the command and runs it, leaving the caller to decide what a failure costs.
+func Start() error {
 	cmd := &cli.Command{
 		Name:      "twelvedata-exporter",
 		Usage:     "Fetch quotes from Twelvedata API",
@@ -27,15 +26,11 @@ func Start() {
 				return err
 			}
 
-			server.Start()
-
-			return nil
+			return server.Start()
 		},
 	}
 
-	if err := cmd.Run(context.Background(), os.Args); err != nil {
-		log.Fatal(err)
-	}
+	return cmd.Run(context.Background(), os.Args)
 }
 
 // registerFlags returns global flags.
