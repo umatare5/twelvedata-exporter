@@ -76,6 +76,7 @@ func (c *Collector) Describe(ch chan<- *prometheus.Desc) {
 	ch <- changePriceDesc
 	ch <- changePercentDesc
 	ch <- volumeDesc
+	ch <- previousClosePriceDesc
 	ch <- priceDesc
 	httpRequestsTotal.Describe(ch)
 }

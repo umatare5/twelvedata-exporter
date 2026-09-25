@@ -4,6 +4,7 @@ package internal
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"io"
 	"net/http"
 	"net/url"
@@ -90,6 +91,9 @@ func NewTwelvedataClient(apiKey string) *TwelvedataClient {
 // apiRequestTimeout bounds each request to the Twelvedata API.
 const apiRequestTimeout = 10 * time.Second
 
+// errQuoteAbsent reports an upstream error, which decodes into the quote struct rather than failing.
+var errQuoteAbsent = errors.New("quote is absent from the response")
+
 // GetQuote sends GET request to Twelvedata API.
 func (t *TwelvedataClient) GetQuote(symbol string) (*QuoteResponse, error) {
 	// Go forwards the credential header to a subdomain of the initial host, so no redirect is followed.
@@ -142,8 +146,8 @@ func (t *TwelvedataClient) GetQuote(symbol string) (*QuoteResponse, error) {
 	}
 
 	if data.Name == "" {
-		log.Errorf("Name is not included in JSON: %s", err)
-		return nil, err
+		log.Errorf("Error retrieving quote for %s: %s", symbol, errQuoteAbsent)
+		return nil, errQuoteAbsent
 	}
 
 	queryDuration.Observe(time.Since(start).Seconds())
