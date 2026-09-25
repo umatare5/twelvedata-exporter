@@ -4,6 +4,16 @@ Notable changes to the metric surface, one section per release, listing the pull
 
 ## [Unreleased]
 
+## [v1.3.1]
+
+- [#81](https://github.com/umatare5/twelvedata-exporter/pull/81) – Warn that a minor release may change the metric surface
+- [#82](https://github.com/umatare5/twelvedata-exporter/pull/82) – Open the restriction gloss with a noun
+- [#83](https://github.com/umatare5/twelvedata-exporter/pull/83) – Align the document set with the sibling exporters
+- [#84](https://github.com/umatare5/twelvedata-exporter/pull/84) – Rebuild on every make build and keep worktrees on make clean
+- [#85](https://github.com/umatare5/twelvedata-exporter/pull/85) – Write American English in the contributing guide and config
+- [#86](https://github.com/umatare5/twelvedata-exporter/pull/86) – Cover every package with unit tests and gate coverage at 80 percent
+- [#87](https://github.com/umatare5/twelvedata-exporter/pull/87) – Check the coverage badge link again
+
 ## [v1.3.0]
 
 - [#61](https://github.com/umatare5/twelvedata-exporter/pull/61) – Deprecate the per-architecture image tags
@@ -50,7 +60,8 @@ Notable changes to the metric surface, one section per release, listing the pull
 - [#58](https://github.com/umatare5/twelvedata-exporter/pull/58) – Migrate goreleaser Docker packaging to dockers_v2
 - [#59](https://github.com/umatare5/twelvedata-exporter/pull/59) – Update golangci-lint to v2.13.2 and bump version to v1.2.0
 
-[Unreleased]: https://github.com/umatare5/twelvedata-exporter/compare/v1.3.0...HEAD
+[Unreleased]: https://github.com/umatare5/twelvedata-exporter/compare/v1.3.1...HEAD
+[v1.3.1]: https://github.com/umatare5/twelvedata-exporter/releases/tag/v1.3.1
 [v1.3.0]: https://github.com/umatare5/twelvedata-exporter/releases/tag/v1.3.0
 [v1.2.1]: https://github.com/umatare5/twelvedata-exporter/releases/tag/v1.2.1
 [v1.2.0]: https://github.com/umatare5/twelvedata-exporter/releases/tag/v1.2.0
