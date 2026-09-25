@@ -28,7 +28,7 @@ The [client timeout](../internal/twelvedata.go#L91) bounds one call and the [wri
 
 Both paths answer on the address `--web.listen-address` and `--web.listen-port` bind, and neither authenticates. [`SECURITY.md`](../SECURITY.md) specifies the network exposure they assume.
 
-| Path     | Methods | Status | Behaviour                           |
+| Path     | Methods | Status | Behavior                            |
 | :------- | :------ | :----- | :---------------------------------- |
 | `/price` | Any     | 200    | Scrapes the symbols the query names |
 | `/`      | Any     | 200    | Catch-all landing page, never 404   |

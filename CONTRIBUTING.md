@@ -23,7 +23,7 @@ These points are where this repository departs from the shared defaults.
 
 ## Testing
 
-No Go test exists yet, so `promtool` lints the sample rules and nothing asserts behaviour.
+No Go test exists yet, so `promtool` lints the sample rules and nothing asserts behavior.
 
 - **Check the rules with `promtool` locally.** `--lint-fatal` is required, because a lint finding otherwise still exits 0.
 - **Redirect `baseURL` to an `httptest` server.** It is unexported, so only a test inside `internal` can rewrite it.
