@@ -18,7 +18,7 @@ This page specifies what is particular to this one.
 These points are where this repository departs from the shared defaults.
 
 - **Do not assume every check runs.** Four are path-filtered: govulncheck, markdownlint, Link Check and actionlint.
-- **Do not lean on the coverage gate.** No test exists yet, so CI passes at 0 percent coverage until the first one lands.
+- **Keep coverage above 80 percent.** `make test-unit` writes the profile, and the coverage workflow is what judges it.
 - **Copy a flag change into the README.** The `--help` block lives there, and nothing regenerates it.
 
 ## Testing
