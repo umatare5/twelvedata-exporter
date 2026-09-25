@@ -23,12 +23,14 @@ These points are where this repository departs from the shared defaults.
 
 ## Testing
 
-No Go test exists yet, so `promtool` lints the sample rules and nothing asserts behavior.
+These points are where this repository's tests depart from the shared approach.
 
 - **Check the rules with `promtool` locally.** `--lint-fatal` is required, because a lint finding otherwise still exits 0.
 - **Redirect `baseURL` to an `httptest` server.** It is unexported, so only a test inside `internal` can rewrite it.
 - **Probe reachability with the `demo` key.** A few symbols answer and the rest return `401`, so it proves the path alone.
 - **Name one symbol per demo request.** A comma-separated list comes back `401` whatever instruments it names.
+- **Capture a fixture from the live API.** `internal/testdata` holds real payloads, so a shape change fails the decode.
+- **Gather through a pedantic registry.** It rejects a series `Collect` publishes without a matching `Describe`.
 
 The `Prometheus Rules` job runs these two commands.
 
