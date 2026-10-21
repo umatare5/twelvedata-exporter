@@ -4,6 +4,15 @@ Notable changes to the metric surface, one section per release, listing the pull
 
 ## [Unreleased]
 
+## [v1.3.2]
+
+- [#89](https://github.com/umatare5/twelvedata-exporter/pull/89) – Update all patch dependencies
+- [#90](https://github.com/umatare5/twelvedata-exporter/pull/90) – Update all minor dependencies
+- [#91](https://github.com/umatare5/twelvedata-exporter/pull/91) – Update module github.com/urfave/cli/v3 to v3.14.0
+- [#92](https://github.com/umatare5/twelvedata-exporter/pull/92) – Update all patch dependencies
+- [#93](https://github.com/umatare5/twelvedata-exporter/pull/93) – Update module github.com/prometheus/client_golang to v1.25.0
+- [#94](https://github.com/umatare5/twelvedata-exporter/pull/94) – Raise the toolchain to Go 1.27.3 and release v1.3.2
+
 ## [v1.3.1]
 
 - [#81](https://github.com/umatare5/twelvedata-exporter/pull/81) – Warn that a minor release may change the metric surface
@@ -60,7 +69,8 @@ Notable changes to the metric surface, one section per release, listing the pull
 - [#58](https://github.com/umatare5/twelvedata-exporter/pull/58) – Migrate goreleaser Docker packaging to dockers_v2
 - [#59](https://github.com/umatare5/twelvedata-exporter/pull/59) – Update golangci-lint to v2.13.2 and bump version to v1.2.0
 
-[Unreleased]: https://github.com/umatare5/twelvedata-exporter/compare/v1.3.1...HEAD
+[Unreleased]: https://github.com/umatare5/twelvedata-exporter/compare/v1.3.2...HEAD
+[v1.3.2]: https://github.com/umatare5/twelvedata-exporter/releases/tag/v1.3.2
 [v1.3.1]: https://github.com/umatare5/twelvedata-exporter/releases/tag/v1.3.1
 [v1.3.0]: https://github.com/umatare5/twelvedata-exporter/releases/tag/v1.3.0
 [v1.2.1]: https://github.com/umatare5/twelvedata-exporter/releases/tag/v1.2.1
